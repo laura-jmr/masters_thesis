@@ -1,0 +1,36 @@
+#home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button {
+    padding: 1rem 5rem;
+    background-color: var(--color-yellow);
+    border-radius: 5px;
+    border: 2px solid #F65500;
+    font-weight: normal;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 65vh;
+    cursor: pointer;
+}
+
+.button:hover {
+    filter: brightness(0.4) saturate(1.5) ;
+}
+
+.hint {
+    background-color: var(--color-beige);
+    padding: 3rem 5rem;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    width: 50vw;
+    position: absolute;
+    top: 30vh;
+    color: var(--color-background);
+}
+
+.bold {
+    font-weight: bold;
+}
