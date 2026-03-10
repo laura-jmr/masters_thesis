@@ -1,5 +1,5 @@
 #page-layout {
-    background-color: var(--color-background);
+    background-color: var(--color-primary);
     height: 100vh;
 }
 
@@ -22,15 +22,7 @@ header {
     width: 100vw;
 }
 
-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    color: var(--color-background);
-    font-size: 0.8rem;
-    display: flex;
-    justify-content: space-between;
-    width: 100vw;
-    padding: 3rem 20vw;
-    background-color: rgb(24, 4, 7);
+main {
+    height: calc(100vh);
+    overflow-y: hidden;
 }

@@ -6,9 +6,10 @@
 
 .button {
     padding: 1rem 5rem;
-    background-color: var(--color-yellow);
+    background-color: var(--color-highlight);
     border-radius: 5px;
-    border: 2px solid #F65500;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-white);
     font-weight: normal;
     font-size: 1.5rem;
     position: absolute;
@@ -21,14 +22,14 @@
 }
 
 .hint {
-    background-color: var(--color-beige);
+    background-color: var(--color-secondary);
     padding: 3rem 5rem;
     border-radius: 5px;
     font-size: 1.5rem;
     width: 50vw;
     position: absolute;
     top: 30vh;
-    color: var(--color-background);
+    color: var(--color-white);
 }
 
 .bold {

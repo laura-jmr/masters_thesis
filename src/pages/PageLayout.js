@@ -11,11 +11,6 @@ function PageLayout({ children }) {
             <main>
                 {children}
             </main>
-
-            <footer>
-                <p>© Laura Jürgensmeier, 2026</p>
-                <p>Master's Thesis for Computer Science Master</p>
-            </footer>
         </div>
     );
 }

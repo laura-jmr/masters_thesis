@@ -1,0 +1,26 @@
+#consent-requests {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.consent-request {
+    background-color: var(--color-secondary);
+    border: 3px solid var(--color-highlight);
+    color: var(--color-white);
+    width: 30vw;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    justify-content: center;
+    border-radius: 15px;
+}
+
+.consent-request:hover {
+    filter: brightness(0.4);
+    cursor: pointer;
+}

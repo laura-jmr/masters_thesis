@@ -1,7 +1,8 @@
 :root {
-  --color-background: #420214;
-  --color-yellow: #FFFB7E;
-  --color-beige: #FDF1D8;
+  --color-primary: #F29E4B;
+  --color-secondary: #2A5C81;
+  --color-highlight: #E9663F;
+  --color-white: #fff8e9;
 }
 
 /* Horizontal Mobile */
