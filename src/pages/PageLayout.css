@@ -16,13 +16,58 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100px;
-    color: white;
+    height: 200px;
     position: fixed;
     width: 100vw;
+    z-index: 999;
+}
+
+header img{
+    width: 300px;
+    backdrop-filter: opacity(20%);
+}
+
+header logo {
+    background-color: var(--color-secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    mix-blend-mode: hard-light;
+    font-weight: 800;
 }
 
 main {
-    height: calc(100vh);
-    overflow-y: hidden;
+    min-height: 100vh;
+
+    background: radial-gradient(
+        circle,
+        rgba(214, 91, 14, 1) 0%,
+        rgba(216, 96, 15, 1) 30%,
+        rgba(249, 215, 46, 1) 100%
+    );
+
+    background-size: 100% 100%;
+    background-position: center;
+
+    animation: pulseBackground 10s ease-in-out infinite;
+}
+
+@keyframes pulseBackground {
+    0% {
+        background-size: 100% 100%;
+    }
+    50% {
+        background-size: 140% 140%;
+    }
+    100% {
+        background-size: 100% 100%;
+    }
+}
+
+footer {
+    background-color: var(--color-highlight);
+    height: 100px;
+    padding: 1rem 8vw;
+    text-align: center;
+    line-height: 2rem;
+    font-weight: 300;
 }

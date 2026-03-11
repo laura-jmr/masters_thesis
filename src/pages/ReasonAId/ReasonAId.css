@@ -1,0 +1,98 @@
+#reasonaid {
+    height: fit-content;
+}
+
+.information-container {
+    margin-top: 55vh;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 2rem;
+}
+
+.information-data-container {
+    width: 50%;
+    margin: 1rem;
+    padding: 2rem;
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
+    color: var(--color-beige);
+    border-radius: 25px;
+    position: relative;
+}
+
+.information-data-container h2 {
+    text-align: center;
+}
+
+.information-personal-data {
+    margin-left: 100px;
+    margin-top: 2rem;
+}
+
+.information-personal-header {
+    cursor: pointer;
+    padding: 0.5rem 0;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.information-personal ul {
+    display: flex;
+    width: calc(100%) -260px;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.information-personal-item {
+    background-color: var(--color-beige);
+    border-radius: 25px;
+    padding: 0.5rem;
+    color: var(--color-black);
+    mix-blend-mode: multiply;
+}
+
+.information-personal-item span {
+    margin-right: 2rem;
+    font-weight: bold;
+}
+
+.chevron {
+    transition: transform 0.4s ease;
+}
+
+.chevron.open {
+    transform: rotate(90deg);
+}
+
+.information-personal-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.information-personal-list.open {
+    max-height: 500px;
+}
+
+.section-controls {
+    display: flex;
+    position: absolute;
+    right: 2.1rem;
+    top: 2.1rem;
+}
+
+.section-controls button {
+    color: var(--color-black);
+    background-color: var(--color-beige);
+    padding: 0.5rem;
+    border-radius: 35px;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    transition: filter 0.1s ease-in-out;
+}
+
+.section-controls button:hover {
+    filter: brightness(1.5);
+}

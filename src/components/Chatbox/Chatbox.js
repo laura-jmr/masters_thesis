@@ -71,19 +71,12 @@ function ChatBox() {
         {messages.map((msg, index) => (
           <div key={index} className={msg.role === "user" ? "message user-message" : "message chatbot-message"}>
             <p>{msg.text}</p>
+            <p className="message-role">{msg.role === "user" ? "You" : "ReasonAId"}</p>
           </div>
         ))}
       </div>
 
       <div className="chatbox-input-section">
-        <div className="chatbox-tools">
-          <div className="chatbox-ai-tools">
-            <i class="fa fa-file"></i>
-            <i class="fa fa-search"></i>
-          </div>
-          <i class="fa fa-gavel"></i>
-        </div>
-
         <div className="chatbox-input-field">
           <textarea
             value={message}
@@ -96,7 +89,7 @@ function ChatBox() {
           />
 
           <button className="chatbox-send-button" onClick={sendMessage} disabled={loading}>
-            <i class="fa fa-paper-plane"></i>
+            <i className="fa fa-paper-plane"></i>
           </button>
         </div>
 

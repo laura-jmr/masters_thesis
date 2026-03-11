@@ -2,63 +2,67 @@ import './Sidemenu.css';
 import { useState } from 'react';
 
 function Sidemenu() {
-    const [openBox, setOpenBox] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const toggleBox = (boxName) => {
-        setOpenBox(openBox === boxName ? null : boxName);
+    const sendFinalDecisionMessage = async () => {
+        setLoading(true);
+
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "user",
+                text: (
+                    <>
+                        <i className="fa fa-gavel"></i> Final decision requested
+                    </>
+                )
+            }
+        ]);
+
+        try {
+            const res = await fetch("http://localhost:5050/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: "GAVEL" }),
+            });
+
+            const data = await res.json();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.reply, "text/html");
+            const paragraph = doc.querySelector("p");
+
+            const botReply = paragraph ? paragraph.textContent : "No response received.";
+
+            setMessages((prev) => [
+                ...prev,
+                { role: "bot", text: botReply }
+            ]);
+
+        } catch (err) {
+            console.error(err);
+
+            setMessages((prev) => [
+                ...prev,
+                { role: "bot", text: "Error while contacting the server." }
+            ]);
+
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className='sidemenu'>
-            <h2>Information</h2>
+            <h2>Action Buttons</h2>
             <div className='sidemenu-buttons'>
-                <div>
-                    <button onClick={() => toggleBox('personal')}><i class="fa fa-address-card"></i>
-                        Personal Data</button>
-                    {openBox === 'personal' && (
-                        <div className='info-box' id='personal-info'>
-                            <div>
-                                <p><span>Name:</span></p>
-                                <p>Max Mustermann</p>
-                            </div>
-                            <div>
-                                <p><span>Age:</span></p>
-                                <p>29</p>
-                            </div>
-                            <div>
-                                <p><span>Insurance:</span></p>
-                                <p>iKK</p>
-                            </div>
-                            <div>
-                                <p><span>Address:</span></p>
-                                <p>Berlin</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div>
-                    <button onClick={() => toggleBox('consent')}><i class="fa fa-envelope-open"></i> Consent Request</button>
-                    {openBox === 'consent' && (
-                        <div className='info-box'>
-                            <p>
-                                This consent request asks whether you want to share your
-                                fictive personal data for research purposes.
-                            </p>
-                            <p>
-                                You can read all details carefully before making your decision.
-                            </p>
-                            <p>
-                                Additional information can be placed here so the box becomes scrollable.
-                            </p>
-                            <p>
-                                More text... More text... More text... More text... More text...
-                            </p>
-                        </div>
-                    )}
-                </div>
+                <i className="fa fa-file"></i>
+                <i className="fa fa-search"></i>
+                <i className="fa fa-gavel" onClick={sendFinalDecisionMessage}></i>
             </div>
-            <p>© Laura Jürgensmeier, 2026</p>
-            <p>Master's Thesis for Computer Science Master</p>
         </div>
     );
 }
