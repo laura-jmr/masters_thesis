@@ -6,23 +6,42 @@ import './Sidemenu.css';
 import { useState } from 'react';
 
 function Sidemenu({ setMessages, loading, setLoading }) {
+    const saveMessage = async (message) => {
+        await fetch("http://localhost:5050/api/message", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+        });
+    };
+
     const sendSummaryMessage = async () => {
         if (loading) return;
 
         setLoading(true);
 
+        const newMsg = {
+            role: "user",
+            typ: "chat",
+            text: (
+                <>
+                    <i className="fa fa-file"></i> Konversation zusammenfassen lassen.
+                </>
+            ),
+            rawText: "BEFEHL: Konversation zusammenfassen lassen.",
+            time: new Date()
+        };
+
         setMessages((prev) => [
             ...prev,
-            {
-                role: "user",
-                text: (
-                    <>
-                        <i className="fa fa-file"></i> Konversation zusammenfassen lassen.
-                    </>
-                ),
-                time: new Date()
-            }
+            newMsg
         ]);
+
+        saveMessage({
+            role: newMsg.role,
+            text: newMsg.rawText
+        })
 
         try {
             const res = await fetch("http://localhost:5050/api/summary", {
@@ -34,11 +53,17 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
             const data = await res.json();
 
-            const botReply = data.overallSummary || "No response received.";
+            const botReply = data.gesamteZusammenfassung || "No response received.";
 
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", text: botReply, time: new Date() }
+                {
+                    role: "bot",
+                    typ: "summary",
+                    themen: data.themen,
+                    gesamteZusammenfassung: data.gesamteZusammenfassung,
+                    time: new Date()
+                }
             ]);
 
         } catch (err) {
@@ -46,7 +71,7 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", text: "Error while contacting the server.", time: new Date() }
+                { role: "bot", typ: "chat", text: "Error while contacting the server.", time: new Date() }
             ]);
 
         } finally {
@@ -59,18 +84,27 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
         setLoading(true);
 
+        const newMsg = {
+            role: "user",
+            typ: "chat",
+            text: (
+                <>
+                    <i className="fa fa-star"></i> Perspektive erweitern lassen.
+                </>
+            ),
+            rawText: "BEFEHL: Perspektive erweitern lassen.",
+            time: new Date()
+        };
+
         setMessages((prev) => [
             ...prev,
-            {
-                role: "user",
-                text: (
-                    <>
-                        <i className="fa fa-star"></i> Perspektive erweitern lassen.
-                    </>
-                ),
-                time: new Date()
-            }
+            newMsg
         ]);
+
+        saveMessage({
+            role: newMsg.role,
+            text: newMsg.rawText
+        })
 
         try {
             const res = await fetch("http://localhost:5050/api/perspective", {
@@ -86,7 +120,7 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", text: botReply, time: new Date() }
+                { role: "bot", typ: "perspective", text: botReply, time: new Date() }
             ]);
 
         } catch (err) {
@@ -94,7 +128,7 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", text: "Error while contacting the server.", time: new Date() }
+                { role: "bot", typ: "chat", text: "Error while contacting the server.", time: new Date() }
             ]);
 
         } finally {
@@ -107,18 +141,27 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
         setLoading(true);
 
+        const newMsg = {
+            role: "user",
+            typ: "chat",
+            text: (
+                <>
+                    <i className="fa fa-gavel"></i> Finale Entscheidung treffen.
+                </>
+            ),
+            rawText: "BEFEHL: Perspektive erweitern lassen.",
+            time: new Date()
+        };
+
         setMessages((prev) => [
             ...prev,
-            {
-                role: "user",
-                text: (
-                    <>
-                        <i className="fa fa-gavel"></i> Ich möchte meine finale Entscheidung treffen.
-                    </>
-                ),
-                time: new Date()
-            }
+            newMsg
         ]);
+
+        saveMessage({
+            role: newMsg.role,
+            text: newMsg.rawText
+        })
 
         try {
             const res = await fetch("http://localhost:5050/api/finaldecision", {
@@ -134,10 +177,18 @@ function Sidemenu({ setMessages, loading, setLoading }) {
                 ...prev,
                 {
                     role: "bot",
-                    type: "summary",
-                    topics: data.summary.topics,
-                    closingQuestion: data.summary.closingQuestion,
+                    typ: "final-summary",
+                    themen: data.summary.themen,
+                    abschließendeFrage: data.summary.abschließendeFrage,
                     time: new Date()
+                }
+            ]);
+
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: "system",
+                    typ: "final-check"
                 }
             ]);
 
@@ -146,7 +197,7 @@ function Sidemenu({ setMessages, loading, setLoading }) {
 
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", text: "Error while contacting the server.", time: new Date() }
+                { role: "bot", typ: "chat", text: "Error while contacting the server.", time: new Date() }
             ]);
 
         } finally {
@@ -160,9 +211,15 @@ function Sidemenu({ setMessages, loading, setLoading }) {
                 <Tooltip text={"Zusammenfassung der Konversation"}>
                     <FilePenLineIcon size={"3rem"} onClick={sendSummaryMessage} className="sidemenu-button" />
                 </Tooltip>
-                <Tooltip text={"Perspektive erweitern"}>
-                    <TelescopeIcon size={"3rem"} onClick={sendPerspectiveMessage} className="sidemenu-button" />
-                </Tooltip>
+                {/*
+<Tooltip text={"Perspektive erweitern"}>
+  <TelescopeIcon
+    size={"3rem"}
+    onClick={sendPerspectiveMessage}
+    className="sidemenu-button"
+  />
+</Tooltip>
+*/}
                 <Tooltip text={"Finale Entscheidung treffen"}>
                     <GavelIcon size={"3rem"} onClick={sendFinalDecisionMessage} className="sidemenu-button" />
                 </Tooltip>

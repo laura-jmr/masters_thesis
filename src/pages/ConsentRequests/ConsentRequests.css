@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    top: 5vh;
+    top: 11vh;
     color: var(--color-white);
     font-style: italic;
 }

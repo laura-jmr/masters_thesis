@@ -3,7 +3,7 @@ import Home from "./pages/Home/Home";
 import NotFound from "./pages/NotFound/NotFound";
 import ConsentRequests from "./pages/ConsentRequests/ConsentRequests";
 import ReasonAId from "./pages/ReasonAId/ReasonAId";
-import AIdvise from "./pages/AIdvise/AIdvise";
+import Outro from "./pages/Outro/Outro";
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
       <Route path="/reasonaid-consent1" element={<ReasonAId selectedConsent={0}/>} />
       <Route path="/reasonaid-consent2" element={<ReasonAId selectedConsent={1}/>} />
       <Route path="/reasonaid-consent3" element={<ReasonAId selectedConsent={2}/>} />
+      <Route path="/outro" element={<Outro/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

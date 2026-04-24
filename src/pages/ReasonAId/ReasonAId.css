@@ -2,6 +2,10 @@
     height: fit-content;
 }
 
+.cursive {
+    font-style: italic;
+}
+
 .intro-overlay {
     background-color: rgba(0, 0, 0, 0.517);
     width: 100vw;

@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 
 const contextPath = path.resolve("./context.json");
+const chatHistoryPath = path.resolve("./chatHistory.json");
 
 function loadContext() {
   return JSON.parse(fs.readFileSync(contextPath, "utf-8"));
@@ -15,37 +16,112 @@ function saveContext(context) {
   fs.writeFileSync(contextPath, JSON.stringify(context, null, 2), "utf-8");
 }
 
+function loadChatHistory() {
+  return JSON.parse(fs.readFileSync(chatHistoryPath, "utf-8"));
+}
+
+function saveChatHistory(history) {
+  fs.writeFileSync(chatHistoryPath, JSON.stringify(history, null, 2), "utf-8");
+}
+
+function appendToChatHistory({ role, text }) {
+  const history = loadChatHistory();
+
+  const time = new Date().toLocaleTimeString("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  history.push({
+    role,
+    text,
+    time
+  });
+
+  saveChatHistory(history);
+}
+
 function validateChatUpdate(update) {
   return (
     update &&
-    Array.isArray(update.treatedTopics) &&
-    Array.isArray(update.userIntention) &&
-    Array.isArray(update.potentialBlindspots) &&
-    Array.isArray(update.conversationSummary) &&
-    typeof update.assistantQuestion === "string"
+    Array.isArray(update.behandelteThemen) &&
+    Array.isArray(update.nutzerIntentionen) &&
+    Array.isArray(update.konversationZusammenfassung) &&
+    typeof update.reflektierendeFrage === "string"
   );
+}
+
+function mergeBehandelteThemen(existing = [], incoming = []) {
+  const map = new Map();
+
+  existing.forEach(item => {
+    map.set(item.thema, {
+      ...item,
+      evidenz: [...(item.evidenz || [])]
+    });
+  });
+
+  incoming.forEach(item => {
+    if (!map.has(item.thema)) {
+      map.set(item.thema, item);
+    } else {
+      const oldItem = map.get(item.thema);
+
+      map.set(item.thema, {
+        thema: item.thema,
+
+        status: mergeStatus(oldItem.status, item.status),
+
+        evidenz: Array.from(new Set([
+          ...oldItem.evidenz,
+          ...item.evidenz
+        ]))
+      });
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+function mergeStatus(oldStatus, newStatus) {
+  const priority = {
+    "offen": 1,
+    "besprochen": 2,
+    "vertiefung_nötig": 3
+  };
+
+  return priority[newStatus] > priority[oldStatus]
+    ? newStatus
+    : oldStatus;
+}
+
+function mergeUnique(existing = [], incoming = []) {
+  const map = new Map();
+
+  [...existing, ...incoming].forEach(item => {
+    map.set(JSON.stringify(item), item);
+  });
+
+  return Array.from(map.values());
 }
 
 function mergeContext(oldContext, update) {
   return {
     ...oldContext,
     memory: {
-      treatedTopics: [
-        ...(oldContext.memory?.treatedTopics || []),
-        ...(update.treatedTopics || [])
-      ],
-      userIntention: [
-        ...(oldContext.memory?.userIntention || []),
-        ...(update.userIntention || [])
-      ],
-      potentialBlindspots: [
-        ...(oldContext.memory?.potentialBlindspots || []),
-        ...(update.potentialBlindspots || [])
-      ],
-      conversationSummary: [
-        ...(oldContext.memory?.conversationSummary || []),
-        ...(update.conversationSummary || [])
-      ]
+      behandelteThemen: mergeBehandelteThemen(
+        oldContext.memory?.behandelteThemen,
+        update.behandelteThemen
+      ),
+      nutzerIntentionen: mergeUnique(
+        oldContext.memory?.nutzerIntentionen,
+        update.nutzerIntentionen
+      ),
+      konversationZusammenfassung: mergeUnique(
+        oldContext.memory?.konversationZusammenfassung,
+        update.konversationZusammenfassung
+      )
     }
   };
 }
@@ -58,10 +134,13 @@ Regeln:
 - Du stellst AUSSCHLIESSLICH reflektierende Fragen.
 - Stelle jeweils nur EINE Frage aufeinmal.
 - Extrahiere die relevanten Argumentationen aus den Nutzernachrichten.
-- Aktualisiere den Gedächtnisspeicher.
+- Aktualisiere den Gedächtnisspeicher Memory im Kontext.
 - Verwende NUR die bereitgestellte JSON-Datei als Gedächstnispeicher.
+- Überprüfe vorab, ob du einen neuen Punkt im Gedächtnisspeicher aufmachst, oder zu einem bestehen Punkt etwas ergänzt.
 - Gib AUSSCHLIESSLICH gültiges JSON zurück.
+- WiedergabeAussage ist optional: wenn sinnvoll, gib eine kurze Spiegelung der Nutzerhaltung zu einer Entscheidungsdimension (max. 1 Satz); wenn nicht sinnvoll, gib leeren Strin "" zurück
 - Du antwortest auf DEUTSCH.
+- Du dutzt den Nutzer.
 
 Gib NUR dieses JSON-Format zurück zurück:
 {
@@ -84,7 +163,8 @@ Gib NUR dieses JSON-Format zurück zurück:
       "punkte": ["string"]
     }
   ],
-  "reflektierendeFrage": "string"
+  "reflektierendeFrage": "string",
+  "wiedergabeAussage": "string"
 }
 `;
 
@@ -107,6 +187,10 @@ app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body;
     const context = loadContext();
+    appendToChatHistory({
+      role: "user",
+      text: message
+    });
 
     const response = await client.responses.create({
       model: "gpt-4o-mini",
@@ -130,74 +214,65 @@ app.post("/api/chat", async (req, res) => {
             type: "object",
             additionalProperties: false,
             properties: {
-              treatedTopics: {
+              behandelteThemen: {
                 type: "array",
                 items: {
                   type: "object",
                   additionalProperties: false,
                   properties: {
-                    topic: { type: "string" },
+                    thema: { type: "string" },
                     status: {
                       type: "string",
-                      enum: ["discussed", "open", "needs_followup"]
+                      enum: ["besprochen", "offen", "vertiefung_nötig"]
                     },
-                    evidence: {
+                    evidenz: {
                       type: "array",
                       items: { type: "string" }
                     }
                   },
-                  required: ["topic", "status", "evidence"]
+                  required: ["thema", "status", "evidenz"]
                 }
               },
-              userIntention: {
+              nutzerIntentionen: {
                 type: "array",
                 items: {
                   type: "object",
                   additionalProperties: false,
                   properties: {
-                    statement: { type: "string" },
-                    source_message: { type: "string" }
+                    intention: { type: "string" },
+                    quelle: { type: "string" }
                   },
-                  required: ["statement", "source_message"]
+                  required: ["intention", "quelle"]
                 }
               },
-              potentialBlindspots: {
+              konversationZusammenfassung: {
                 type: "array",
                 items: {
                   type: "object",
                   additionalProperties: false,
                   properties: {
-                    topic: { type: "string" },
-                    reason: { type: "string" }
-                  },
-                  required: ["topic", "reason"]
-                }
-              },
-              conversationSummary: {
-                type: "array",
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    topic: { type: "string" },
-                    points: {
+                    thema: { type: "string" },
+                    punkte: {
                       type: "array",
                       items: { type: "string" }
                     }
                   },
-                  required: ["topic", "points"]
+                  required: ["thema", "punkte"]
                 }
               },
-              assistantQuestion: {
+              reflektierendeFrage: {
+                type: "string"
+              },
+              wiedergabeAussage: {
                 type: "string"
               }
             },
             required: [
-              "treatedTopics",
-              "userIntention",
-              "potentialBlindspots",
-              "conversationSummary",
-              "assistantQuestion"
+              "behandelteThemen",
+              "nutzerIntentionen",
+              "konversationZusammenfassung",
+              "reflektierendeFrage",
+              "wiedergabeAussage"
             ]
           }
         }
@@ -212,8 +287,22 @@ app.post("/api/chat", async (req, res) => {
     const newContext = mergeContext(context, update);
     saveContext(newContext);
 
+    const replyParts = [];
+
+    if (update.wiedergabeAussage) {
+      replyParts.push(update.wiedergabeAussage);
+    }
+
+    replyParts.push(update.reflektierendeFrage);
+
+    const reply = replyParts.join("\n\n");
+
+    appendToChatHistory({
+      role: "bot",
+      text: reply
+    });
     res.json({
-      reply: update.assistantQuestion,
+      reply,
       context: newContext
     });
   } catch (error) {
@@ -231,28 +320,46 @@ app.post("/api/finaldecision", async (req, res) => {
     const response = await client.responses.create({
       model: "gpt-4o-mini",
       instructions: `
-      Du erstellst eine strukturierte Zusammenfassung der Konversation.
-      Verwende ausschließlich die bereitgestellte JSON-Datei.
-      Erfinde keine neuen Themen oder Punkte.
-      Gib NUR gültiges JSON in diesem Format zurück:
-  {
-    "thema": [
-      {
-        "thema": "string",
-        "punkt": ["string"]
-      }
-    ]
-  }
-  `,
+      Du bist ein Assistent zur Entscheidungsunterstützung bei Einwilligungsentscheidungen über die Weitergabe elektronischer Gesundheitsdaten.
+
+      Deine Aufgabe:
+- Fasse die bisherige Unterhaltung zusammen.
+- Verwende AUSSCHLIESSLICH den Memory aus der bereitgestellte JSON-Datei als Kontext
+- Gliedere die Zusammenfassung nach Themen.
+- Erfinde nichts, was nicht im Memory-Kontext steht.
+- Gib keine Empfehlungen ab.
+- Gib AUSSCHLIESSLICH gültiges JSON zurück.
+- Du antwortest auf DEUTSCH.
+
+Gib dieses Format zurück:
+{
+  "typ": "final-summary",
+  "themen": [
+    {
+      "thema": "string",
+      "punkte": ["string"]
+    }
+  ],
+  "abschließendeFrage": "string"
+}
+      `,
       input: [
         {
           role: "user",
-          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+          content: `Erstelle eine Zusammenfassung basierend auf dem Memory im Kontext:
+
+CURRENT_CONTEXT_JSON:
+${JSON.stringify(context, null, 2)}`
         }
       ]
     });
 
     const summary = JSON.parse(response.output_text);
+
+    appendToChatHistory({
+      role: "bot",
+      text: JSON.stringify(summary)
+    });
 
     return res.json({ summary });
   } catch (error) {
@@ -274,9 +381,9 @@ app.post("/api/summary", async (req, res) => {
 
       Deine Aufgabe:
 - Fasse die bisherige Unterhaltung zusammen.
-- Verwende AUSSCHLIESSLICH die bereitgestellte JSON-Datei als Kontext
+- Verwende AUSSCHLIESSLICH den Memory aus der bereitgestellte JSON-Datei als Kontext
 - Gliedere die Zusammenfassung nach Themen.
-- Erfinde nichts, was nicht im Kontext steht.
+- Erfinde nichts, was nicht im Memory-Kontext steht.
 - Gib keine Empfehlungen ab.
 - Gib AUSSCHLIESSLICH gültiges JSON zurück.
 - Du antwortest auf DEUTSCH.
@@ -287,7 +394,7 @@ Gib dieses Format zurück:
   "themen": [
     {
       "thema": "string",
-      "punkt": ["string"]
+      "punkte": ["string"]
     }
   ],
   "gesamteZusammenfassung": "string"
@@ -296,12 +403,20 @@ Gib dieses Format zurück:
       input: [
         {
           role: "user",
-          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+          content: `Erstelle eine Zusammenfassung basierend auf dem Memory im Kontext:
+
+CURRENT_CONTEXT_JSON:
+${JSON.stringify(context, null, 2)}`
         }
       ]
     });
 
     const result = JSON.parse(response.output_text);
+
+    appendToChatHistory({
+      role: "bot",
+      text: result
+    });
 
     res.json(result);
   } catch (error) {
@@ -348,12 +463,39 @@ Return this format:
 
     const result = JSON.parse(response.output_text);
 
+    appendToChatHistory({
+      role: "bot",
+      text: result
+    });
+
     res.json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({
       error: "Something went wrong while generating the flashlight question."
     });
+  }
+});
+
+app.post("/api/message", (req, res) => {
+  try {
+    const { role, text } = req.body;
+
+    if (typeof text !== "string") {
+      return res.status(400).json({
+        error: "text must be a string"
+      });
+    }
+
+    appendToChatHistory({
+      role: role || "system",
+      text
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save message" });
   }
 });
 

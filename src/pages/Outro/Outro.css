@@ -1,0 +1,32 @@
+#outro {
+ width: 100%;
+ height: 100vh;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+}
+
+.circle-svg {
+  width: 300px;
+  height: 300px;
+}
+
+.rotating-text {
+  animation: rotate 12s linear infinite;
+  transform-origin: center;
+   fill: var(--color-white);
+}
+
+.outro-check{
+color: var(--color-white);
+position: absolute;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

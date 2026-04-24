@@ -17,6 +17,16 @@ function ReasonAId({ selectedConsent }) {
   const [popupStyle, setPopupStyle] = useState({});
   const [overlayStyle, setOverlayStyle] = useState({});
 
+  const saveMessage = async (message) => {
+    await fetch("http://localhost:5050/api/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
+  };
+
   const introSteps = [
     {
       title: "Wilkommen bei ReasonAId",
@@ -61,6 +71,7 @@ function ReasonAId({ selectedConsent }) {
   const consents = [
     {
       id: 0,
+      title: "Forschungsprojekt eines privaten Pharmaunternehmens",
       recipient: "Sie werden gebeten, Ihre Gesundheitsdaten an ein privates Pharmaunternehmen weiterzugeben.",
       purpose: "Das Unternehmen hat sich zum Ziel gesetzt, personalisierte Therapien für chronische Erkrankungen zu entwickeln.",
       dataType: "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel). ",
@@ -70,6 +81,7 @@ function ReasonAId({ selectedConsent }) {
     },
     {
       id: 1,
+      title: "Forschungsprojekt des Militärs",
       recipient: "Sie werden gebeten, Ihre Gesundheitsdaten für ein vom Militär finanziertes Forschungsprojekt zur Verfügung zu stellen. ",
       purpose: "Ziel des Projekts ist es, die medizinische Versorgung von Veteranen zu verbessern.",
       dataType: "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel).",
@@ -79,6 +91,7 @@ function ReasonAId({ selectedConsent }) {
     },
     {
       id: 2,
+      title: "Forschungsprojekt für die Pandemieforschung",
       recipient: "Sie werden gebeten, Ihre Gesundheitsdaten für ein staatlich finanziertes Forschungsprojekt an einer Universität zur Verfügung zu stellen.",
       purpose: "Ziel des Projekts ist es, zukünftige Pandemien effektiver zu bewältigen.",
       dataType: "Die angeforderten Daten umfassen Ihre  psychischen Gesundheitdaten (z.B. Diagnosen wie Depressionen oder Angststörungen) sowie Ihre genetischen Informationen (z.B. DNA-Test-Ergebnisse).",
@@ -104,14 +117,31 @@ function ReasonAId({ selectedConsent }) {
   }, []);
 
   const sendInitialBotMessage = () => {
+    const newMsg = {
+      role: "bot",
+      typ: "chat",
+      text: (
+        <>
+          Hallo, ich bin <span className='cursive'>ReasonAId</span> - dein KI-Assistent bei der Entscheidung über deine Gesundheitsdaten.
+          <br />
+          Du betrachtest gerade die Anfrage über das <strong>{activeConsent?.title}</strong>.
+          <br /><br />
+          Wie stehst du zu dieser Einwilligungsanfrage?
+        </>
+      ),
+      rawText: `Hallo, ich bin ReasonAId - dein KI-Assistent bei der Entscheidung über deine Gesundheitsdaten. Du betrachtest gerade die Anfrage über das ${activeConsent?.title}.  Wie stehst du zu dieser Einwilligungsanfrage?`,
+      time: new Date()
+    };
+
     setMessages((prev) => [
       ...prev,
-      {
-        role: "bot",
-        text: "Hallo, ich bin ReasonAId. Ich kann dir helfen, diese Einwilligungsanfrage zu verstehen, und dich bei deiner Entscheidung unterstützen.\n\nBitte teile mir deine Meinung zu dieser Einwilligungsanfrage mit.",
-        time: new Date()
-      },
+      newMsg
     ]);
+
+    saveMessage({
+      role: newMsg.role,
+      text: newMsg.rawText
+    });
   };
 
   const handleNextIntroStep = () => {
@@ -217,7 +247,7 @@ function ReasonAId({ selectedConsent }) {
         )}
 
         <Sidemenu setMessages={setMessages} setLoading={setLoading} />
-        <ChatBox messages={messages} setMessages={setMessages} loading={loading} setLoading={setLoading} />
+        <ChatBox messages={messages} setMessages={setMessages} loading={loading} setLoading={setLoading} activeConsent={activeConsent} />
 
         <div className='information-container'>
 

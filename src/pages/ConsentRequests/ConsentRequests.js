@@ -9,7 +9,6 @@ function ConsentRequests() {
         <PageLayout>
             <div id='consent-requests'>
                 <div className="hub-header">
-                    <h1>AI Decision Support</h1>
                     <p>Study Hub</p>
                 </div>
 

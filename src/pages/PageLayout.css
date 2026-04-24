@@ -16,10 +16,15 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 200px;
+    height: 120px;
     position: fixed;
     width: 100vw;
     z-index: 999;
+    font-family: "Inter", sans-serif;
+    font-weight: bold;
+    font-size: 2rem;
+    color: var(--color-primary);
+    mix-blend-mode: hard-light;
 }
 
 header img{
