@@ -1,0 +1,27 @@
+.tooltip {
+    position: relative;
+}
+
+.tooltip-text {
+    position: absolute;
+    top: -2rem;
+    font-size: 1rem;
+    background-color: var(--color-beige);
+    color: var(--color-black);
+    font-weight: 400;
+    width: fit-content;
+    padding: 0.2rem;
+    border-radius: 5px;
+    text-wrap: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.tooltip:hover .tooltip-text {
+    opacity: 1;
+}
+
+.tooltip-left {
+    left: -40px;
+}

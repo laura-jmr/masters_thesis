@@ -3,7 +3,7 @@
     height: 50vh;
     top: calc(25vh - 2rem);
     z-index: 999;
-    width: 150px;
+    width: 100px;
     border-radius: 0 25px 25px 0;
     left: -2px;
     position: relative;
@@ -32,12 +32,12 @@
     justify-content: space-between;
 }
 
-.sidemenu-buttons i {
+.sidemenu-button {
     color: var(--color-beige);
-    padding: 1rem;
+    z-index: 999;
 }
 
-.sidemenu-buttons i:hover {
+.sidemenu-button:hover {
     cursor: pointer;
     filter: brightness(0.3);
 }

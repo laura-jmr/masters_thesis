@@ -1,9 +1,9 @@
 .chatbox {
     position: absolute;
-    left: 15vw;
+    left: 20vw;
     top: 10vh;
-    width: 80vw;
-    height: 100vh;
+    width: 60vw;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -22,7 +22,8 @@
 }
 
 .message {
-    background-color: var(--color-secondary);
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
     color: var(--color-black);
     padding: 2rem;
     font-size: 1.5rem;
@@ -52,7 +53,7 @@
     margin-left: 40%;
     text-align: end;
     align-self: flex-end;
-    background-color: var(--color-highlight);
+    background-color: var(--color-white);
 }
 
 .user-message:after {
@@ -69,11 +70,18 @@
     margin-top: -15px;
 }
 
+.user-message .message-role {
+    text-align: end;
+}
+
 .message-role {
     position: absolute;
     font-size: 1rem;
-    bottom: -1.2rem;
-    color: var(--color-beige);
+    bottom: -1.5rem;
+    left: 0;
+    width: 100%;
+    text-align: left;
+    color: var(--color-black);
     mix-blend-mode: multiply;
 }
 
@@ -113,22 +121,19 @@
     color: var(--color-beige);
     font-size: 1rem;
     resize: none;
-    -webkit-mask-image: radial-gradient(circle 1.5rem at calc(100% - 2rem) 50%, transparent 98%, black 100%);
-    mask-image: radial-gradient(circle 1.5rem at calc(100% - 2rem) 50%, transparent 98%, black 100%);
     border: 3px solid transparent;
     transition: border-image 0.2s ease;
+    z-index: 444;
 }
 
 
 .chatbox-input-field textarea:focus {
     outline: none;
     border: 3px solid transparent;
-    border-image: radial-gradient(
-        circle,
-        rgba(214, 91, 14, 1) 0%,
-        rgba(216, 96, 15, 1) 30%,
-        rgba(249, 215, 46, 1) 100%
-    );
+    border-image: radial-gradient(circle,
+            rgba(214, 91, 14, 1) 0%,
+            rgba(216, 96, 15, 1) 30%,
+            rgba(249, 215, 46, 1) 100%);
     border-image-slice: 1;
 }
 
@@ -148,11 +153,80 @@
     mix-blend-mode: multiply;
 }
 
-.chatbox-send-button i {
+.chatbox-send-button * {
     position: absolute;
-    right: 1.3rem;
-    font-size: 1.8rem;
-    color: var(--color-beige);
-    top: 1.7rem;
-    mix-blend-mode: multiply;
+    right: 1rem;
+    color: var(--color-highlight);
+    top: 1rem;
+    z-index: 666;
+    cursor: pointer;
+}
+
+
+.topic-title {
+    background-color: var(--color-beige);
+    width: fit-content;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    transition: border-radius 0.5s ease;
+}
+
+.topic-title:hover {
+    filter: brightness(1.5);
+    cursor: pointer;
+}
+
+.topic-title.open {
+    filter: brightness(1.5);
+    border-radius: 25px 25px 0 0;
+}
+
+.topic-title.open:hover {
+    filter: brightness(1);
+}
+
+.topic-summary {
+    max-height: 0;
+    overflow: hidden;
+    transition:
+        max-height 0.5s ease,
+        padding 0.3s ease,
+        border-width 0.3s ease;
+    border-radius: 0 25px 25px 25px;
+    list-style: circle;
+}
+
+.topic-summary li {
+    margin-left: 1.5rem;
+}
+
+.topic-summary.open {
+    max-height: 500px;
+    border: 3px solid var(--color-beige);
+    padding: 0.5rem 1rem;
+}
+
+.closing-question span {
+    font-weight: 600;
+    font-style: italic;
+}
+
+.summary-buttons {
+    width: 70%;
+    margin-left: 15%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+
+    bottom: -3rem;
+}
+
+.summary-buttons button {
+    width: 30%;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-white);
+    border-radius: 25px;
+    
 }

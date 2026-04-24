@@ -5,7 +5,7 @@ function PageLayout({ children }) {
     return (
         <div id='page-layout'>
             <header>
-                <img src='logo.PNG'/>
+                
             </header>
 
             <main>

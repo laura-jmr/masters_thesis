@@ -8,12 +8,23 @@ function ConsentRequests() {
     return (
         <PageLayout>
             <div id='consent-requests'>
-                <div className="consent-request" onClick={() => navigate("/reasonaid")}>
-                    <h2>Consent Request 1 with ReasonAId</h2>
+                <div className="hub-header">
+                    <h1>AI Decision Support</h1>
+                    <p>Study Hub</p>
                 </div>
 
-                <div className="consent-request" onClick={() => navigate("/aidvice")}>
-                    <h2>Consent Request 2 with AIdvice</h2>
+                <div className='consent-request-box'>
+                    <div className="consent-request" onClick={() => navigate("/reasonaid-consent1")}>
+                        <p><span className='bold'>Einwilligungsfrage 1:</span> Forschungsprojekt eines privaten Pharmaunternehmens</p>
+                    </div>
+
+                    <div className="consent-request" onClick={() => navigate("/reasonaid--consent2")}>
+                        <p><span className='bold'>Einwilligungsfrage 2:</span> Forschungsprojekt des Militärs</p>
+                    </div>
+
+                    <div className="consent-request" onClick={() => navigate("/reasonaid--consent3")}>
+                        <p><span className='bold'>Einwilligungsfrage 3:</span> Daten zur psychischen Gesundheit für Pandemieforschung</p>
+                    </div>
                 </div>
             </div>
         </PageLayout >

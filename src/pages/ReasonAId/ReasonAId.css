@@ -2,8 +2,26 @@
     height: fit-content;
 }
 
+.intro-overlay {
+    background-color: rgba(0, 0, 0, 0.517);
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 9999;
+}
+
+.intro-popup {
+    background-color: var(--color-white);
+    width: 500px;
+    padding: 2rem;
+    border-radius: 15px;
+    position: absolute;
+    top: 40vh;
+    left: calc(50vw - 250px);
+}
+
 .information-container {
-    margin-top: 55vh;
+    margin-top: 40vh;
     display: flex;
     justify-content: space-between;
     padding-bottom: 2rem;
@@ -18,6 +36,7 @@
     color: var(--color-beige);
     border-radius: 25px;
     position: relative;
+    z-index: 10000;
 }
 
 .information-data-container h2 {
@@ -46,10 +65,9 @@
 }
 
 .information-personal-item {
-    background-color: var(--color-beige);
+    color: var(--color-beige);
     border-radius: 25px;
     padding: 0.5rem;
-    color: var(--color-black);
     mix-blend-mode: multiply;
 }
 
@@ -84,11 +102,8 @@
 }
 
 .section-controls button {
-    color: var(--color-black);
-    background-color: var(--color-beige);
-    padding: 0.5rem;
-    border-radius: 35px;
-    margin: 0 0.5rem;
+    color: var(--color-beige);
+    background-color: transparent;
     cursor: pointer;
     transition: filter 0.1s ease-in-out;
 }

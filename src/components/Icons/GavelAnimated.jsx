@@ -1,0 +1,90 @@
+import { motion, useAnimation } from "framer-motion";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+
+const GAVEL_VARIANTS = {
+  normal: {
+    rotate: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut",
+    },
+  },
+  animate: {
+    rotate: [0, -20, 25, 0],
+    transition: {
+      duration: 0.8,
+      times: [0, 0.6, 0.8, 1],
+      ease: ["easeInOut", "easeOut", "easeOut"],
+    },
+  },
+};
+
+const GavelIcon = forwardRef(function GavelIcon(
+  { onMouseEnter, onMouseLeave, className, size = 28, ...props },
+  ref
+) {
+  const controls = useAnimation();
+  const isControlledRef = useRef(false);
+
+  useImperativeHandle(ref, () => {
+    isControlledRef.current = true;
+    return {
+      startAnimation: () => controls.start("animate"),
+      stopAnimation: () => controls.start("normal"),
+    };
+  });
+
+  const handleMouseEnter = useCallback(
+    (e) => {
+      if (isControlledRef.current) {
+        onMouseEnter && onMouseEnter(e);
+      } else {
+        controls.start("animate");
+      }
+    },
+    [controls, onMouseEnter]
+  );
+
+  const handleMouseLeave = useCallback(
+    (e) => {
+      if (isControlledRef.current) {
+        onMouseLeave && onMouseLeave(e);
+      } else {
+        controls.start("normal");
+      }
+    },
+    [controls, onMouseLeave]
+  );
+
+  return (
+    <div
+      className={className}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      {...props}
+    >
+      <motion.svg
+        animate={controls}
+        fill="none"
+        height={size}
+        initial="normal"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        style={{ transformOrigin: "0% 100%", transformBox: "fill-box" }}
+        variants={GAVEL_VARIANTS}
+        viewBox="0 0 24 24"
+        width={size}
+      >
+        <path d="m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381" />
+        <path d="m16 16 6-6" />
+        <path d="m21.5 10.5-8-8" />
+        <path d="m8 8 6-6" />
+        <path d="m8.5 7.5 8 8" />
+      </motion.svg>
+    </div>
+  );
+});
+
+export { GavelIcon };

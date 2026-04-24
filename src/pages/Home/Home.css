@@ -4,6 +4,27 @@
     justify-content: center;
 }
 
+#home h1 {
+    font-family: "Bungee", sans-serif;
+    font-size: 3rem;
+}
+
+.home-header {
+    position: absolute;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    top: 5vh;
+    color: var(--color-white);
+    font-style: italic;
+}
+
+.home-header p {
+    font-size: 2rem;
+}
+
 .button {
     padding: 1rem 5rem;
     background-color: var(--color-highlight);
@@ -13,25 +34,29 @@
     font-weight: normal;
     font-size: 1.5rem;
     position: absolute;
-    top: 65vh;
+    top: 70vh;
     cursor: pointer;
 }
 
 .button:hover {
-    filter: brightness(0.4) saturate(1.5) ;
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
+    color: var(--color-beige);
 }
 
 .hint {
-    background-color: var(--color-secondary);
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
     padding: 3rem 5rem;
     border-radius: 5px;
     font-size: 1.5rem;
     width: 50vw;
     position: absolute;
     top: 30vh;
-    color: var(--color-white);
+    color: var(--color-beige);
 }
 
 .bold {
-    font-weight: bold;
+    font-weight: 600;
+    font-style: italic;
 }

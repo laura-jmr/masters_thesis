@@ -1,0 +1,103 @@
+.questionnaire {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.questionnaire form {
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
+    border-radius: 25px;
+    margin-top: 20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60vw;
+    padding: 2rem 10%;
+
+    overflow-y: auto;
+    height: 70vh;
+}
+
+.questionnaire h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+#personal_factors,
+#data_factors,
+#characteristics {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#personal_factors div,
+#data_factors div,
+#characteristics fieldset,
+#characteristics div {
+    width: 50%;
+    margin: 1rem 0;
+}
+
+#age {
+    width: 100px;
+    padding: 0.5rem;
+    border-radius: 15px;
+    background-color: var(--color-beige);
+    font-size: 1rem;
+    text-align: center;
+}
+
+.modal-overlay {
+    position: fixed;
+    width: 100vw;
+    height: 110vh;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.454);
+    z-index: 998;
+}
+
+.modal {
+    margin-top: 10vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 50vw;
+    height: 55vh;
+    background-color: var(--color-white);
+    border-radius: 25px;
+    padding: 2rem;
+    z-index: 999;
+    position: relative;
+}
+
+.modal h2 {
+    margin-bottom: 4rem;
+}
+
+.prediction {
+    background-color: var(--color-highlight);
+    padding: 2rem;
+    border-radius: 15px;
+    font-size: 1.5rem;
+}
+
+.decision-buttons button {
+    width: 200px;
+    height: 60px;
+    border-radius: 15px;
+    background-color: var(--color-highlight);
+    margin: 2rem;
+}
+
+.close-button {
+    position: absolute;
+    background-color: transparent;
+    right: 2rem;
+    top: 2rem;
+    font-size: 1.5rem;
+}

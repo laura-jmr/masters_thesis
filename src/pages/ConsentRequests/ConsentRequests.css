@@ -1,3 +1,10 @@
+.consent-request-box {
+    width: 75vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 #consent-requests {
     width: 100vw;
     height: 100vh;
@@ -7,20 +14,65 @@
     flex-direction: column;
 }
 
-.consent-request {
-    background-color: var(--color-secondary);
-    border: 3px solid var(--color-highlight);
-    color: var(--color-white);
-    width: 30vw;
-    height: 100px;
+#consent-requests  h1 {
+    font-family: "Bungee", sans-serif;
+    font-size: 3rem;
+}
+
+.hub-header {
+    position: absolute;
+    width: 100vw;
     display: flex;
     align-items: center;
-    margin: 2rem 0;
     justify-content: center;
-    border-radius: 15px;
+    flex-direction: column;
+    top: 5vh;
+    color: var(--color-white);
+    font-style: italic;
+}
+
+.hub-header p {
+    font-size: 2rem;
+}
+
+.consent-request {
+    font-size: 2rem;
+    width: 400px;
+    height: 500px;
+    padding: 1rem 2rem;
+    background-color: var(--color-highlight);
+    border-radius: 5px;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-white);
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 .consent-request:hover {
-    filter: brightness(0.4);
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
+    color: var(--color-beige);
+}
+
+.button {
+    padding: 1rem 5rem;
+    background-color: var(--color-highlight);
+    border-radius: 5px;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-white);
+    font-weight: normal;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 70vh;
     cursor: pointer;
+}
+
+.button:hover {
+    background-color: var(--color-white);
+    mix-blend-mode: hard-light;
+    color: var(--color-beige);
 }

@@ -9,17 +9,20 @@ function Home() {
 
     const hints = [
         <>
-            <p>ReasonAId is an AI powered chatbot, that will try to help you in your decision making.</p>
+            <h1>Willkommen zur Nutzerstudie von Laura's Masterarbeit</h1>
             <br />
-            <p>Feel free to interact with ReasonAId as long as you wish to.</p>
+            <p>Diese Studie ist über KI-unterstütztes Entscheiden im Kontext der Freigabe von Gesundheitsdaten.</p>
         </>,
         <>
-            <p>You will go through <span className='bold'>two consent requests</span>, where you will receive different kind of AI decision support.</p>
+            <p>Du wirst <span className='bold'>zwei Consent Requests</span> durchgehen, in denen Du jeweils verschiedene Arten von KI-Unterstützung erhalten wirst.</p>
             <br />
-            <p>In the end, you decide for each consent request, if you want to share your fictive data or not.</p>
+            <p>Am Ende triffst Du die finale Entscheidung über Deine Gesundheitsdaten. Alle Daten und Consent Requests sind fiktiv.</p>
         </>,
         <>
-            <p>After finishing the first consent request, you will get back to this page to proceed with the second consent request.</p>
+            <p>Jeder Consent Request leitet Dich zu einer einzigartigen Seite.
+                <br/>
+                Nachdem du den ersten Consent Request erledigt hast, wirst Du zu dieser Seite zurückgeleitet, wo Du dann auf den
+            </p>
         </>
     ];
 
@@ -34,11 +37,15 @@ function Home() {
     return (
         <PageLayout>
             <div id='home'>
+                <div className="home-header">
+                    <h1>AI Decision Support</h1>
+                    <p>Study Hub</p>
+                </div>
                 <div className="hint">
                     {hints[hintIndex]}
                 </div>
 
-                <a className='button' onClick={handleContinue}>Continue</a>
+                <a className='button' onClick={handleContinue}>Weiter</a>
             </div>
         </PageLayout >
     );

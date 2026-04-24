@@ -2,6 +2,91 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import fs from "fs";
+import path from "path";
+
+const contextPath = path.resolve("./context.json");
+
+function loadContext() {
+  return JSON.parse(fs.readFileSync(contextPath, "utf-8"));
+}
+
+function saveContext(context) {
+  fs.writeFileSync(contextPath, JSON.stringify(context, null, 2), "utf-8");
+}
+
+function validateChatUpdate(update) {
+  return (
+    update &&
+    Array.isArray(update.treatedTopics) &&
+    Array.isArray(update.userIntention) &&
+    Array.isArray(update.potentialBlindspots) &&
+    Array.isArray(update.conversationSummary) &&
+    typeof update.assistantQuestion === "string"
+  );
+}
+
+function mergeContext(oldContext, update) {
+  return {
+    ...oldContext,
+    memory: {
+      treatedTopics: [
+        ...(oldContext.memory?.treatedTopics || []),
+        ...(update.treatedTopics || [])
+      ],
+      userIntention: [
+        ...(oldContext.memory?.userIntention || []),
+        ...(update.userIntention || [])
+      ],
+      potentialBlindspots: [
+        ...(oldContext.memory?.potentialBlindspots || []),
+        ...(update.potentialBlindspots || [])
+      ],
+      conversationSummary: [
+        ...(oldContext.memory?.conversationSummary || []),
+        ...(update.conversationSummary || [])
+      ]
+    }
+  };
+}
+
+const instructions = `
+Du bist ein Unterstützer im Entscheidungsprozess über die Einwilligung zur Weitergabe elektronischer Gesundheitsdaten.
+
+Regeln:
+- Du gibst KEINE direkten oder indirekten Empfehlungen.
+- Du stellst AUSSCHLIESSLICH reflektierende Fragen.
+- Stelle jeweils nur EINE Frage aufeinmal.
+- Extrahiere die relevanten Argumentationen aus den Nutzernachrichten.
+- Aktualisiere den Gedächtnisspeicher.
+- Verwende NUR die bereitgestellte JSON-Datei als Gedächstnispeicher.
+- Gib AUSSCHLIESSLICH gültiges JSON zurück.
+- Du antwortest auf DEUTSCH.
+
+Gib NUR dieses JSON-Format zurück zurück:
+{
+  "behandelteThemen": [
+    {
+      "thema": "string",
+      "status": "besprochen|offen|benötigt_followup",
+      "evidenz": ["string"]
+    }
+  ],
+  "nutzerIntentionen": [
+    {
+      "intention": "string",
+      "quelle": "string"
+    }
+  ],
+  "konversationZusammenfassung": [
+    {
+      "thema": "string",
+      "punkte": ["string"]
+    }
+  ],
+  "reflektierendeFrage": "string"
+}
+`;
 
 dotenv.config();
 
@@ -21,23 +106,115 @@ const client = new OpenAI({
 app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body;
+    const context = loadContext();
 
     const response = await client.responses.create({
       model: "gpt-4o-mini",
+      instructions,
       input: [
         {
-            role: "developer",
-            content: "You are a helpful advisor in factors influencing the decision to share or not to share electronic health data for a consent request. You help the user come up with their decision. You do NOT give recommendations at any time. You only answer in questions that lead the user to a broader perspective and help the user identify blindspots in their reasoning. You only answer with one question at a time. The user will write you their thoughts and reasons, which you firstly extract and put in a context JSON with the name 'user_intention'. You keep track of your points to help the user identify blindspots in their reasoning in second context JSON with the name 'potential_blindspots'. In your answer, you will first print the 'user_intention' JSON, then the 'potential_blindspots' JSON, then your answer in the format '<p>YOUR ANSWER HERE</p>'. When you get the keyword GAVEL written in all caps, you answer with the following: '<p>Okay, you want to make your final decision now.<br/><br/>Here are the topics we have talked about so far:</p>', followed by '<div className=`topic`><p>THE TOPIC IN ONE WORD</p><ul className=`topic-summary`><li>A POINT MENTIONED IN THE PREVIOUS CHAT ABOUT THE TOPIC</li>'... for each topic talked about in the chat, and at the end of the message you write '<p>You can click on a topic to get a summary of what we talked about in that topic if you want to.<br/><br/><span>Do you feel like we covered every aspect for your decision?</span></p>'"
-        },
-        {
-            role: "user",
-            content: message,
-        },
-    ],
+          role: "user",
+          content: `CURRENT_CONTEXT_JSON:
+    ${JSON.stringify(context, null, 2)}
+    
+    NUTZER_NACHRICHT:
+    ${message}`
+        }
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "chat_update",
+          strict: true,
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              treatedTopics: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    topic: { type: "string" },
+                    status: {
+                      type: "string",
+                      enum: ["discussed", "open", "needs_followup"]
+                    },
+                    evidence: {
+                      type: "array",
+                      items: { type: "string" }
+                    }
+                  },
+                  required: ["topic", "status", "evidence"]
+                }
+              },
+              userIntention: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    statement: { type: "string" },
+                    source_message: { type: "string" }
+                  },
+                  required: ["statement", "source_message"]
+                }
+              },
+              potentialBlindspots: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    topic: { type: "string" },
+                    reason: { type: "string" }
+                  },
+                  required: ["topic", "reason"]
+                }
+              },
+              conversationSummary: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    topic: { type: "string" },
+                    points: {
+                      type: "array",
+                      items: { type: "string" }
+                    }
+                  },
+                  required: ["topic", "points"]
+                }
+              },
+              assistantQuestion: {
+                type: "string"
+              }
+            },
+            required: [
+              "treatedTopics",
+              "userIntention",
+              "potentialBlindspots",
+              "conversationSummary",
+              "assistantQuestion"
+            ]
+          }
+        }
+      }
     });
 
+    const update = JSON.parse(response.output_text);
+
+    if (!validateChatUpdate(update)) {
+      throw new Error("Model returned unexpected JSON shape.");
+    }
+    const newContext = mergeContext(context, update);
+    saveContext(newContext);
+
     res.json({
-      reply: response.output_text,
+      reply: update.assistantQuestion,
+      context: newContext
     });
   } catch (error) {
     console.error(error);
@@ -47,9 +224,137 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-app.get("/api/test", (req, res) => {
-  console.log("TEST ROUTE HIT");
-  res.json({ ok: true });
+app.post("/api/finaldecision", async (req, res) => {
+  try {
+    const context = loadContext();
+
+    const response = await client.responses.create({
+      model: "gpt-4o-mini",
+      instructions: `
+      Du erstellst eine strukturierte Zusammenfassung der Konversation.
+      Verwende ausschließlich die bereitgestellte JSON-Datei.
+      Erfinde keine neuen Themen oder Punkte.
+      Gib NUR gültiges JSON in diesem Format zurück:
+  {
+    "thema": [
+      {
+        "thema": "string",
+        "punkt": ["string"]
+      }
+    ]
+  }
+  `,
+      input: [
+        {
+          role: "user",
+          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+        }
+      ]
+    });
+
+    const summary = JSON.parse(response.output_text);
+
+    return res.json({ summary });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Something went wrong while generating the flashlight question."
+    });
+  }
+});
+
+app.post("/api/summary", async (req, res) => {
+  try {
+    const context = loadContext();
+
+    const response = await client.responses.create({
+      model: "gpt-4o-mini",
+      instructions: `
+      Du bist ein Assistent zur Entscheidungsunterstützung bei Einwilligungsentscheidungen über die Weitergabe elektronischer Gesundheitsdaten.
+
+      Deine Aufgabe:
+- Fasse die bisherige Unterhaltung zusammen.
+- Verwende AUSSCHLIESSLICH die bereitgestellte JSON-Datei als Kontext
+- Gliedere die Zusammenfassung nach Themen.
+- Erfinde nichts, was nicht im Kontext steht.
+- Gib keine Empfehlungen ab.
+- Gib AUSSCHLIESSLICH gültiges JSON zurück.
+- Du antwortest auf DEUTSCH.
+
+Gib dieses Format zurück:
+{
+  "typ": "summary",
+  "themen": [
+    {
+      "thema": "string",
+      "punkt": ["string"]
+    }
+  ],
+  "gesamteZusammenfassung": "string"
+}
+      `,
+      input: [
+        {
+          role: "user",
+          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+        }
+      ]
+    });
+
+    const result = JSON.parse(response.output_text);
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Something went wrong while generating the summary."
+    });
+  }
+});
+
+app.post("/api/perspective", async (req, res) => {
+  try {
+    const context = loadContext();
+
+    const response = await client.responses.create({
+      model: "gpt-4o-mini",
+      instructions: `
+You are a reflective decision-support assistant for consent decisions about sharing electronic health data.
+
+Your task:
+- Look at the provided context JSON.
+- Identify one factor or topic that has not been sufficiently discussed yet.
+- Choose an underexplored topic from the available factors if possible.
+- Ask exactly one reflective question about that topic.
+- Do not give recommendations.
+- Do not summarize the whole conversation.
+- Return ONLY valid JSON.
+
+Return this format:
+{
+  "type": "flashlight",
+  "unexploredTopic": "string",
+  "reason": "string",
+  "question": "string"
+}
+      `,
+      input: [
+        {
+          role: "user",
+          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+        }
+      ]
+    });
+
+    const result = JSON.parse(response.output_text);
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Something went wrong while generating the flashlight question."
+    });
+  }
 });
 
 app.listen(5050, () => {
