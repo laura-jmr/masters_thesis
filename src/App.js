@@ -10,9 +10,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/consent-requests" element={<ConsentRequests />} />
-      <Route path="/reasonaid-consent1" element={<ReasonAId selectedConsent={0}/>} />
-      <Route path="/reasonaid-consent2" element={<ReasonAId selectedConsent={1}/>} />
-      <Route path="/reasonaid-consent3" element={<ReasonAId selectedConsent={2}/>} />
+      <Route path="/reasonaid/:id" element={<ReasonAId />} />
       <Route path="/outro" element={<Outro/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>

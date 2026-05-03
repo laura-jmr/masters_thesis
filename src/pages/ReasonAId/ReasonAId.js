@@ -5,8 +5,9 @@ import Tooltip from '../../components/Tooltip/Tooltip';
 import PageLayout from '../PageLayout';
 import './ReasonAId.css';
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-function ReasonAId({ selectedConsent }) {
+function ReasonAId() {
   const [reply, setReply] = useState("");
   const [open, setOpen] = useState(false);
   const [openSections, setOpenSections] = useState({});
@@ -16,6 +17,18 @@ function ReasonAId({ selectedConsent }) {
   const [introStep, setIntroStep] = useState(0);
   const [popupStyle, setPopupStyle] = useState({});
   const [overlayStyle, setOverlayStyle] = useState({});
+  const { id } = useParams();
+  const consentId = Number(id);
+  const [activeConsent, setActiveConsent] = useState(null);
+
+  useEffect(() => {
+    if (consentId === undefined) return;
+
+    fetch(`http://localhost:5050/api/consents/${consentId}`)
+      .then(res => res.json())
+      .then(data => setActiveConsent(data))
+      .catch(err => console.error("Fehler beim Laden:", err));
+  }, [consentId]);
 
   const saveMessage = async (message) => {
     await fetch("http://localhost:5050/api/message", {
@@ -67,43 +80,6 @@ function ReasonAId({ selectedConsent }) {
     "risks",
     "regulations"
   ];
-
-  const consents = [
-    {
-      id: 0,
-      title: "Forschungsprojekt eines privaten Pharmaunternehmens",
-      recipient: "Sie werden gebeten, Ihre Gesundheitsdaten an ein privates Pharmaunternehmen weiterzugeben.",
-      purpose: "Das Unternehmen hat sich zum Ziel gesetzt, personalisierte Therapien für chronische Erkrankungen zu entwickeln.",
-      dataType: "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel). ",
-      potentialBenefit: "Sie erhalten personalisierte Empfehlungen in Form von Therapiemaßnahmen und digitalen Gesundheitsberichten.",
-      potentialRisk: "Es kann nicht ausgeschlossen werden, dass die Ergebnisse zur Entwicklung kommerzieller Produkte verwendet werden, was einer Verwendung über den ursprünglichen therapeutischen Zweck hinausgeht und die finanziellen Interessen des Unternehmens in den Vordergrund rückt.",
-      dataRegulation: "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
-    },
-    {
-      id: 1,
-      title: "Forschungsprojekt des Militärs",
-      recipient: "Sie werden gebeten, Ihre Gesundheitsdaten für ein vom Militär finanziertes Forschungsprojekt zur Verfügung zu stellen. ",
-      purpose: "Ziel des Projekts ist es, die medizinische Versorgung von Veteranen zu verbessern.",
-      dataType: "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel).",
-      potentialBenefit: "Die Ergebnisse können dazu beitragen, die Behandlung und Genesung von Veteranen nach Einsätzen zu verbessern und medizinische Fortschritte im Bereich der Rehabilitierung zu erzielen.",
-      potentialRisk: "Es wird nicht ausgeschlossen, dass die gewonnenen Erkenntnisse zur Unterstützung militärischer Operationen und strategischer Planung genutzt werden können, was einer Nutzung über den ursprünglichen mediznischen Zweck hinausgeht.",
-      dataRegulation: "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
-    },
-    {
-      id: 2,
-      title: "Forschungsprojekt für die Pandemieforschung",
-      recipient: "Sie werden gebeten, Ihre Gesundheitsdaten für ein staatlich finanziertes Forschungsprojekt an einer Universität zur Verfügung zu stellen.",
-      purpose: "Ziel des Projekts ist es, zukünftige Pandemien effektiver zu bewältigen.",
-      dataType: "Die angeforderten Daten umfassen Ihre  psychischen Gesundheitdaten (z.B. Diagnosen wie Depressionen oder Angststörungen) sowie Ihre genetischen Informationen (z.B. DNA-Test-Ergebnisse).",
-      potentialBenefit: "Die Ergebnisse könnten dazu beitragen, frühzeitig Risikogruppen zu identifizieren, Präventionsmaßnahmen zu verbessern und die Reaktion auf zukünftige Gesundheitskrisen zu optimieren.",
-      potentialRisk: "Ihre Daten werden anonymisiert, dennoch besteht insbesondere bei genetischen Informationen ein Restrisiko der Re-Identifikation.",
-      dataRegulation: "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
-    }
-  ];
-
-  const activeConsent = consents.find(
-    (consent) => consent.id === selectedConsent
-  );
 
   useEffect(() => {
     const hasSeenIntro = localStorage.getItem("reasonaid-intro-seen");
@@ -232,7 +208,12 @@ function ReasonAId({ selectedConsent }) {
     }));
   };
 
+  if (!activeConsent) {
+    return <div>Lade Consent...</div>;
+  }
+
   return (
+
     <PageLayout>
       <div id='reasonaid'>
 
@@ -246,8 +227,8 @@ function ReasonAId({ selectedConsent }) {
           </div>
         )}
 
-        <Sidemenu setMessages={setMessages} setLoading={setLoading} />
-        <ChatBox messages={messages} setMessages={setMessages} loading={loading} setLoading={setLoading} activeConsent={activeConsent} />
+        <Sidemenu setMessages={setMessages} setLoading={setLoading} consentId={consentId}/>
+        <ChatBox messages={messages} setMessages={setMessages} loading={loading} setLoading={setLoading} activeConsent={activeConsent} consentId={consentId}/>
 
         <div className='information-container'>
 

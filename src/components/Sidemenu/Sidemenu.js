@@ -5,7 +5,7 @@ import Tooltip from '../Tooltip/Tooltip';
 import './Sidemenu.css';
 import { useState } from 'react';
 
-function Sidemenu({ setMessages, loading, setLoading }) {
+function Sidemenu({ setMessages, loading, setLoading, consentId }) {
     const saveMessage = async (message) => {
         await fetch("http://localhost:5050/api/message", {
             method: "POST",
@@ -112,15 +112,19 @@ function Sidemenu({ setMessages, loading, setLoading }) {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({ consentId })
             });
 
             const data = await res.json();
 
-            const botReply = data.question || "No response received.";
-
             setMessages((prev) => [
                 ...prev,
-                { role: "bot", typ: "perspective", text: botReply, time: new Date() }
+                {
+                    role: "bot",
+                    typ: "perspective",
+                    themen: data.themen,
+                    time: new Date()
+                }
             ]);
 
         } catch (err) {
@@ -211,15 +215,15 @@ function Sidemenu({ setMessages, loading, setLoading }) {
                 <Tooltip text={"Zusammenfassung der Konversation"}>
                     <FilePenLineIcon size={"3rem"} onClick={sendSummaryMessage} className="sidemenu-button" />
                 </Tooltip>
-                {/*
-<Tooltip text={"Perspektive erweitern"}>
-  <TelescopeIcon
-    size={"3rem"}
-    onClick={sendPerspectiveMessage}
-    className="sidemenu-button"
-  />
-</Tooltip>
-*/}
+
+                <Tooltip text={"Perspektive erweitern"}>
+                    <TelescopeIcon
+                        size={"3rem"}
+                        onClick={sendPerspectiveMessage}
+                        className="sidemenu-button"
+                    />
+                </Tooltip>
+
                 <Tooltip text={"Finale Entscheidung treffen"}>
                     <GavelIcon size={"3rem"} onClick={sendFinalDecisionMessage} className="sidemenu-button" />
                 </Tooltip>

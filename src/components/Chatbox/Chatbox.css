@@ -254,3 +254,13 @@
     font-size: 1rem;
     padding-top: 1rem;
 }
+
+.besprochen {
+    background-color: var(--color-beige);
+    cursor: default !important;
+}
+
+.unbesprochen {
+    background-color: white;
+    cursor: default !important;
+}

@@ -1,0 +1,10 @@
+{
+    "id": 1,
+    "title": "Forschungsprojekt des Militärs",
+    "recipient": "Sie werden gebeten, Ihre Gesundheitsdaten für ein vom Militär finanziertes Forschungsprojekt zur Verfügung zu stellen. ",
+    "purpose": "Ziel des Projekts ist es, die medizinische Versorgung von Veteranen zu verbessern.",
+    "dataType": "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel).",
+    "potentialBenefit": "Die Ergebnisse können dazu beitragen, die Behandlung und Genesung von Veteranen nach Einsätzen zu verbessern und medizinische Fortschritte im Bereich der Rehabilitierung zu erzielen.",
+    "potentialRisk": "Es wird nicht ausgeschlossen, dass die gewonnenen Erkenntnisse zur Unterstützung militärischer Operationen und strategischer Planung genutzt werden können, was einer Nutzung über den ursprünglichen mediznischen Zweck hinausgeht.",
+    "dataRegulation": "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
+  }

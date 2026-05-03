@@ -4,6 +4,10 @@ import dotenv from "dotenv";
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const contextPath = path.resolve("./context.json");
 const chatHistoryPath = path.resolve("./chatHistory.json");
@@ -22,6 +26,12 @@ function loadChatHistory() {
 
 function saveChatHistory(history) {
   fs.writeFileSync(chatHistoryPath, JSON.stringify(history, null, 2), "utf-8");
+}
+
+function loadConsentById(id) {
+  const filePath = `consents/consent-request${id}.json`;
+  const data = fs.readFileSync(filePath, "utf-8");
+  return JSON.parse(data);
 }
 
 function appendToChatHistory({ role, text }) {
@@ -48,7 +58,8 @@ function validateChatUpdate(update) {
     Array.isArray(update.behandelteThemen) &&
     Array.isArray(update.nutzerIntentionen) &&
     Array.isArray(update.konversationZusammenfassung) &&
-    typeof update.reflektierendeFrage === "string"
+    typeof update.reflektierendeFrage === "string" &&
+    typeof update.antwortAufFrageOderAufgabe === "string"
   );
 }
 
@@ -131,14 +142,17 @@ Du bist ein Unterstützer im Entscheidungsprozess über die Einwilligung zur Wei
 
 Regeln:
 - Du gibst KEINE direkten oder indirekten Empfehlungen.
-- Du stellst AUSSCHLIESSLICH reflektierende Fragen.
+- Du stellst bei jeder Antwoirt reflektierende Fragen in reflektierendeFrage.
 - Stelle jeweils nur EINE Frage aufeinmal.
 - Extrahiere die relevanten Argumentationen aus den Nutzernachrichten.
 - Aktualisiere den Gedächtnisspeicher Memory im Kontext.
 - Verwende NUR die bereitgestellte JSON-Datei als Gedächstnispeicher.
 - Überprüfe vorab, ob du einen neuen Punkt im Gedächtnisspeicher aufmachst, oder zu einem bestehen Punkt etwas ergänzt.
+- Als weiteres Hintergrundwissen benutze die Chat Historie.
 - Gib AUSSCHLIESSLICH gültiges JSON zurück.
-- WiedergabeAussage ist optional: wenn sinnvoll, gib eine kurze Spiegelung der Nutzerhaltung zu einer Entscheidungsdimension (max. 1 Satz); wenn nicht sinnvoll, gib leeren Strin "" zurück
+- WiedergabeAussage ist optional: wenn sinnvoll, gib eine kurze Spiegelung der Nutzerhaltung zu einer Entscheidungsdimension (max. 1 Satz); wenn nicht sinnvoll, gib leeren String "" zurück.
+- antwortAufFrageOderAufgabe ist optional: immer wenn der Nutzer dich aktiv etwas fragt oder dir einen Befehl gibt, füllst du antwortAufFrageOderAufgabe aus; ansonst gib einen leeren String "" zurück.
+- Nutze für für die Beantwortung einer Nutzerfrage oder Nutzerbefehl NUR Informationen, die bereits durch den Kontext und Consent bekannt sind, ansonsten schreibst du "Ich kann keine weiteren Informationen dazu geben, da ich dafür nicht gemacht bin."
 - Du antwortest auf DEUTSCH.
 - Du dutzt den Nutzer.
 
@@ -164,7 +178,8 @@ Gib NUR dieses JSON-Format zurück zurück:
     }
   ],
   "reflektierendeFrage": "string",
-  "wiedergabeAussage": "string"
+  "wiedergabeAussage": "string",
+  "antwortAufFrageOderAufgabe": "string"
 }
 `;
 
@@ -185,8 +200,12 @@ const client = new OpenAI({
 
 app.post("/api/chat", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, consentId } = req.body;
+
     const context = loadContext();
+    const chatHistory = loadChatHistory();
+    const consent = loadConsentById(consentId);
+
     appendToChatHistory({
       role: "user",
       text: message
@@ -198,9 +217,15 @@ app.post("/api/chat", async (req, res) => {
       input: [
         {
           role: "user",
-          content: `CURRENT_CONTEXT_JSON:
+          content: `CONSENT_CONTEXT:
+          ${JSON.stringify(consent, null, 2)}
+          
+          CURRENT_CONTEXT_JSON:
     ${JSON.stringify(context, null, 2)}
     
+    CHAT_HISTORY:
+${JSON.stringify(chatHistory, null, 2)}
+
     NUTZER_NACHRICHT:
     ${message}`
         }
@@ -265,6 +290,9 @@ app.post("/api/chat", async (req, res) => {
               },
               wiedergabeAussage: {
                 type: "string"
+              },
+              antwortAufFrageOderAufgabe: {
+                type: "string"
               }
             },
             required: [
@@ -272,7 +300,8 @@ app.post("/api/chat", async (req, res) => {
               "nutzerIntentionen",
               "konversationZusammenfassung",
               "reflektierendeFrage",
-              "wiedergabeAussage"
+              "wiedergabeAussage",
+              "antwortAufFrageOderAufgabe"
             ]
           }
         }
@@ -291,6 +320,10 @@ app.post("/api/chat", async (req, res) => {
 
     if (update.wiedergabeAussage) {
       replyParts.push(update.wiedergabeAussage);
+    }
+
+    if (update.antwortAufFrageOderAufgabe) {
+      replyParts.push(update.antwortAufFrageOderAufgabe);
     }
 
     replyParts.push(update.reflektierendeFrage);
@@ -429,34 +462,41 @@ ${JSON.stringify(context, null, 2)}`
 
 app.post("/api/perspective", async (req, res) => {
   try {
+    const { consentId } = req.body;
     const context = loadContext();
-
+    const consent = loadConsentById(consentId);
     const response = await client.responses.create({
       model: "gpt-4o-mini",
       instructions: `
-You are a reflective decision-support assistant for consent decisions about sharing electronic health data.
+      Du bist ein Assistent zur Entscheidungsunterstützung bei Einwilligungsentscheidungen über die Weitergabe elektronischer Gesundheitsdaten.
 
-Your task:
-- Look at the provided context JSON.
-- Identify one factor or topic that has not been sufficiently discussed yet.
-- Choose an underexplored topic from the available factors if possible.
-- Ask exactly one reflective question about that topic.
-- Do not give recommendations.
-- Do not summarize the whole conversation.
-- Return ONLY valid JSON.
+Deine Aufgabe:
+- Schaue dir die beigefügten Kontext JSON an
+- Suche die wichtigsten unbesprochenen Dimensionen und Faktoren (max. 3) für die Entscheidung und überprüfe, ob der Nutzer sie bereits mit dir besprochen hat oder noch nicht (behandelteThemen status)
+- Du schreibst den Status "offen" für unbehandelte oder nicht vollständig besprochene Themen und den Status "besprochen" für besprochene Themen.
+- Du fügst alle bereits behandelten Themen aus dem Memory behandelteThemen hinzu.
+- Du gibst keine direkten Empfehlungen.
+- Gib AUSSCHLIESSLICH gültiges JSON zurück.
+- Du antwortest auf DEUTSCH.
 
-Return this format:
+Gib dieses Format zurück:
 {
-  "type": "flashlight",
-  "unexploredTopic": "string",
-  "reason": "string",
-  "question": "string"
+  "typ": "perspective",
+  "themen": [
+    {
+      "thema": "string",
+      "status": "string"
+    }
+  ]
 }
       `,
       input: [
         {
           role: "user",
-          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}`
+          content: `CURRENT_CONTEXT_JSON:\n${JSON.stringify(context, null, 2)}
+          
+          CONSENT_CONTEXT:
+${JSON.stringify(consent, null, 2)}`
         }
       ]
     });
@@ -472,7 +512,7 @@ Return this format:
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: "Something went wrong while generating the flashlight question."
+      error: "Something went wrong while generating the perspectives."
     });
   }
 });
@@ -497,6 +537,24 @@ app.post("/api/message", (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Failed to save message" });
   }
+});
+
+app.get("/api/consents/:id", (req, res) => {
+  const id = req.params.id;
+
+  const filePath = path.join(
+    __dirname,
+    "consents",
+    `consent-request${id}.json`
+  );
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(404).json({ error: "Consent nicht gefunden" });
+    }
+
+    res.json(JSON.parse(data));
+  });
 });
 
 app.listen(5050, () => {

@@ -1,0 +1,10 @@
+{
+    "id": 0,
+    "title": "Forschungsprojekt eines privaten Pharmaunternehmens",
+    "recipient": "Sie werden gebeten, Ihre Gesundheitsdaten an ein privates Pharmaunternehmen weiterzugeben.",
+    "purpose": "Das Unternehmen hat sich zum Ziel gesetzt, personalisierte Therapien für chronische Erkrankungen zu entwickeln.",
+    "dataType": "Die angeforderten Daten umfassen Ihre medizinische Vorgeschichte inklusive der Behandlungsergebnisse und Ihre physiologische Daten (z.B. Blutdruck, Hormonspiegel). ",
+    "potentialBenefit": "Sie erhalten personalisierte Empfehlungen in Form von Therapiemaßnahmen und digitalen Gesundheitsberichten.",
+    "potentialRisk": "Es kann nicht ausgeschlossen werden, dass die Ergebnisse zur Entwicklung kommerzieller Produkte verwendet werden, was einer Verwendung über den ursprünglichen therapeutischen Zweck hinausgeht und die finanziellen Interessen des Unternehmens in den Vordergrund rückt.",
+    "dataRegulation": "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
+}

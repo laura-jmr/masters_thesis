@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import './Chatbox.css';
 import { SendIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-function ChatBox({ messages, setMessages, loading, setLoading, activeConsent }) {
+function ChatBox({ messages, setMessages, loading, setLoading, activeConsent, consentId }) {
   const [message, setMessage] = useState("");
   const [openSections, setOpenSections] = useState({});
   const messagesRef = useRef(null);
   const inputRef = useRef(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const saveMessage = async (message) => {
     await fetch("http://localhost:5050/api/message", {
@@ -54,7 +54,7 @@ function ChatBox({ messages, setMessages, loading, setLoading, activeConsent }) 
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, consentId: consentId }),
       });
 
       const data = await res.json();
@@ -214,6 +214,26 @@ function ChatBox({ messages, setMessages, loading, setLoading, activeConsent }) 
                   <p className="closing-question">Wenn du möchtest, kannst du auf ein Thema klicken, um eine Zusammenfassung dessen zu erhalten, worüber wir in diesem Thema gesprochen haben.<br /><br />
                     <span>Was sind deine Gedanken zu den Punkten?</span>
                   </p>
+
+                </div>
+              </div>
+            )}
+
+            {msg.typ === "perspective" && (
+              <div>
+                <div className="perspective-message">
+                  Hier ist eine Übersicht über relevante Themen:
+                  {msg.themen.map((topic, index) => (
+                    <div key={index} className="topic">
+                      <p className={`topic-title ${topic.status === "besprochen" ? "besprochen" : "unbesprochen"}`}>{topic.thema}</p>
+                    </div>
+                  ))}
+
+                  <p className="closing-question"><br /><br />
+                    <span>Möchtest du mit einem der Themen weitermachen?</span>
+                  </p>
+
+
 
                 </div>
               </div>

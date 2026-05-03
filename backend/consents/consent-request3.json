@@ -1,0 +1,10 @@
+{
+    "id": 2,
+    "title": "Forschungsprojekt für die Pandemieforschung",
+    "recipient": "Sie werden gebeten, Ihre Gesundheitsdaten für ein staatlich finanziertes Forschungsprojekt an einer Universität zur Verfügung zu stellen.",
+    "purpose": "Ziel des Projekts ist es, zukünftige Pandemien effektiver zu bewältigen.",
+    "dataType": "Die angeforderten Daten umfassen Ihre  psychischen Gesundheitdaten (z.B. Diagnosen wie Depressionen oder Angststörungen) sowie Ihre genetischen Informationen (z.B. DNA-Test-Ergebnisse).",
+    "potentialBenefit": "Die Ergebnisse könnten dazu beitragen, frühzeitig Risikogruppen zu identifizieren, Präventionsmaßnahmen zu verbessern und die Reaktion auf zukünftige Gesundheitskrisen zu optimieren.",
+    "potentialRisk": "Ihre Daten werden anonymisiert, dennoch besteht insbesondere bei genetischen Informationen ein Restrisiko der Re-Identifikation.",
+    "dataRegulation": "Ihre Daten werden gemäß den geltenden Daten-schutzbestimmungen verarbeitet und gespeichert."
+  }
