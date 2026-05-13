@@ -26,10 +26,166 @@
   },
   "memory": {
     "behandelteThemen": [
+      {
+        "thema": "Forschungsprojekt des Militärs",
+        "status": "besprochen",
+        "evidenz": [
+          "Ziel des Projekts ist es, die medizinische Versorgung von Veteranen zu verbessern.",
+          "Die Ergebnisse können dazu beitragen, die Behandlung und Genesung von Veteranen nach Einsätzen zu verbessern.",
+          "Nutzer hat Bedenken hinsichtlich der Sicherheit seiner Daten im militärischen Kontext.",
+          "Nutzer fragt nach einer möglichen Gegenleistung für die Datenweitergabe.",
+          "Frage nach einer möglichen Gegenleistung für die Datenweitergabe.",
+          "Nutzer hat nach einem potenziellen Nutzen für sich selbst gefragt.",
+          "Nutzer hält die Risiken für überwiegen."
+        ]
+      },
+      {
+        "thema": "Gegenleistung für Datenweitergabe",
+        "status": "offen",
+        "evidenz": [
+          "Nutzer möchte wissen, welche Gegenleistungen es für die Bereitstellung seiner Daten gibt.",
+          "Nutzer hat nach einer möglichen Gegenleistung für die Datenweitergabe gefragt."
+        ]
+      },
+      {
+        "thema": "Bedenken hinsichtlich der Sicherheit der Daten",
+        "status": "besprochen",
+        "evidenz": [
+          "Nutzer äußert, dass er nicht zustimmen kann, wenn die Daten nicht sicher sind."
+        ]
+      }
     ],
     "nutzerIntentionen": [
+      {
+        "intention": "Skepsis gegenüber der Wirksamkeit der Datenweitergabe für Veteranen",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Wunsch nach Transparenz über die Verwendung der eigenen Daten",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Wunsch nach Kontrolle über die eigenen Daten, einschließlich Löschung",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Bedenken bezüglich Datenschutz im militärischen Kontext",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Frage nach Gegenleistung für die Datenweitergabe",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Frage nach den Vorteilen der Datenweitergabe",
+        "quelle": "NutzerNachricht"
+      },
+      {
+        "intention": "Frage nach dem persönlichen Nutzen der Datenweitergabe",
+        "quelle": "NutzerNachricht"
+      }
     ],
     "konversationZusammenfassung": [
+      {
+        "thema": "Zweck der Verwendung der Daten",
+        "punkte": [
+          "Nutzer bezweifelt den Nutzen der Daten für Veteranen."
+        ]
+      },
+      {
+        "thema": "Zweck der Verwendung der Daten",
+        "punkte": [
+          "Nutzer bezweifelt den Nutzen der Daten für Veteranen.",
+          "Nutzer fragt nach dem Zusammenhang zwischen persönlichen Daten und den Bedürfnissen von Veteranen."
+        ]
+      },
+      {
+        "thema": "Zweck der Verwendung der Daten",
+        "punkte": [
+          "Nutzer bezweifelt den Nutzen der Daten für Veteranen.",
+          "Nutzer fragt nach dem Zusammenhang zwischen persönlichen Daten und den Bedürfnissen von Veteranen.",
+          "Nutzer möchte wissen, was mit seinen Daten passiert."
+        ]
+      },
+      {
+        "thema": "Kontrolle über die eigenen Daten",
+        "punkte": [
+          "Nutzer legt Wert darauf, zu verstehen, was mit seinen Daten passiert.",
+          "Nutzer möchte die Möglichkeit zur dauerhaften Löschung seiner Daten haben."
+        ]
+      },
+      {
+        "thema": "Transparenz bei der Datennutzung",
+        "punkte": [
+          "Nutzer hält Transparenz für wichtig und will klare Informationen zur Datennutzung.",
+          "Datenschutz ist dem Nutzer wichtig, einschließlich der Sicherheit der Server."
+        ]
+      },
+      {
+        "thema": "Bedenken bezüglich Datenschutz im militärischen Kontext",
+        "punkte": [
+          "Nutzer hat Bedenken, dass Daten in falsche oder erpresserische Hände gelangen könnten."
+        ]
+      },
+      {
+        "thema": "Bedenken bezüglich Datenschutz im militärischen Kontext",
+        "punkte": [
+          "Nutzer hat Bedenken, dass Daten in falsche oder erpresserische Hände gelangen könnten.",
+          "Nutzer betont, dass er nicht zustimmen kann, wenn die Daten nicht sicher sind."
+        ]
+      },
+      {
+        "thema": "Bedenken bezüglich Datenschutz im militärischen Kontext",
+        "punkte": [
+          "Nutzer hat Bedenken, dass Daten in falsche oder erpresserische Hände gelangen könnten.",
+          "Nutzer fragt nach einer möglichen Gegenleistung für die Datenweitergabe."
+        ]
+      },
+      {
+        "thema": "Gegenleistung für Datenweitergabe",
+        "punkte": [
+          "Nutzer möchte wissen, welche Gegenleistungen es für die Bereitstellung seiner Daten gibt."
+        ]
+      },
+      {
+        "thema": "Gegenleistung für Datenweitergabe",
+        "punkte": [
+          "Nutzer fragt nach den Vorteilen der Bereitstellung seiner Daten."
+        ]
+      },
+      {
+        "thema": "Zweck der Verwendung der Daten",
+        "punkte": [
+          "Nutzer fragt nach dem potenziellen Nutzen für sich selbst, wenn er seine Daten freigibt."
+        ]
+      },
+      {
+        "thema": "Sicherheitsbedenken",
+        "punkte": [
+          "Nutzer hält die Risiken für überwiegen."
+        ]
+      },
+      {
+        "thema": "Transparenz bei der Datennutzung",
+        "punkte": [
+          "Nutzer hält Transparenz für wichtig und will klare Informationen zur Datennutzung.",
+          "Der Schutz der Daten ist dem Nutzer wichtig, einschließlich der Sicherheit der Server."
+        ]
+      },
+      {
+        "thema": "Risiken der Datenweitergabe",
+        "punkte": [
+          "Nutzer hält die Risiken für überwiegen.",
+          "Nutzer kann nicht zustimmen, wenn er Sicherheitsbedenken hat."
+        ]
+      },
+      {
+        "thema": "Risiken der Datenweitergabe",
+        "punkte": [
+          "Nutzer hält die Risiken für überwiegen.",
+          "Nutzer kann nicht zustimmen, wenn Sicherheitsbedenken bestehen."
+        ]
+      }
     ]
   }
 }
