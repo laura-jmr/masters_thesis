@@ -86,6 +86,26 @@ function ChatBox({ messages, setMessages, loading, setLoading, activeConsent, co
     }));
   };
 
+  const handleTopicClick = (topic) => {
+    const newMsg = {
+      role: "bot",
+      typ: "chat",
+      text: (
+        <>
+          {topic.frage}
+        </>
+      ),
+      rawText: `${topic.frage}`
+    };
+
+    setMessages((prev) => [...prev, newMsg]);
+
+    saveMessage({
+      role: newMsg.role,
+      text: newMsg.rawText
+    });
+  };
+
   const handleFinalYes = () => {
     const newMsg = {
       role: "system",
@@ -224,7 +244,7 @@ function ChatBox({ messages, setMessages, loading, setLoading, activeConsent, co
                 <div className="perspective-message">
                   Hier ist eine Übersicht über relevante Themen:
                   {msg.themen.map((topic, index) => (
-                    <div key={index} className="topic">
+                    <div key={index} className="topic" onClick={() => handleTopicClick(topic)}>
                       <p className={`topic-title ${topic.status === "besprochen" ? "besprochen" : "unbesprochen"}`}>{topic.thema}</p>
                     </div>
                   ))}
