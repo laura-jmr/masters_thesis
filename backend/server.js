@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const contextPath = path.resolve("./context.json");
 const chatHistoryPath = path.resolve("./chatHistory.json");
+const fictiveEHR = path.resolve("./fictive_ehr.json");
 
 function loadContext() {
   return JSON.parse(fs.readFileSync(contextPath, "utf-8"));
@@ -32,6 +33,10 @@ function loadConsentById(id) {
   const filePath = `consents/consent-request${id}.json`;
   const data = fs.readFileSync(filePath, "utf-8");
   return JSON.parse(data);
+}
+
+function loadEHR() {
+  return JSON.parse(fs.readFileSync(fictiveEHR, "utf-8"));
 }
 
 function appendToChatHistory({ role, text }) {
@@ -59,7 +64,7 @@ function validateChatUpdate(update) {
     Array.isArray(update.nutzerIntentionen) &&
     Array.isArray(update.konversationZusammenfassung) &&
     typeof update.reflektierendeFrage === "string" &&
-    typeof update.antwortAufFrageOderAufgabe === "string"
+    typeof update.antwortAufFragenOderAufgaben === "string"
   );
 }
 
@@ -139,29 +144,31 @@ function mergeContext(oldContext, update) {
 
 const instructions = `
 Du bist ein Unterstützer im Entscheidungsprozess über die Einwilligung zur Weitergabe elektronischer Gesundheitsdaten.
+Du bist ein Forward Reasoning System, dass machine-in-the-loop macht.
 
 Regeln:
 - Du gibst KEINE direkten oder indirekten Empfehlungen.
+- Du gibst KEINE Themen vor, du bist ein machine-in-the-loop System, das Forward Reasoning unterstützen soll.
 - Du stellst bei jeder Antwort genau EINE reflektierende Frage in reflektierendeFrage.
+- Achte bei reflektierendeFrage darauf, keine Fragen zu wiederholen. Benutze hierzu die Chat Historie aus CHAT_HISTORY.
 - Reflektierende Fragen sollen NICHT nach unbekannten Fakten, hypothetischen Szenarien oder Detailwissen fragen.
-- Reflektierende Fragen sollen die Haltung, Prioritäten, Werte, Sorgen oder Gewichtung des Nutzers zu dem aktuellen Thema erkunden.
+- Reflektierende Fragen sollen die Haltung, Prioritäten, Werte, Sorgen oder Gewichtung des Nutzers zu der aktuellen Entscheidungsdimension oder -faktor erkunden.
 - Extrahiere die relevanten Argumentationen aus den Nutzernachrichten.
-- Aktualisiere den Gedächtnisspeicher Memory im Kontext.
-- Verwende NUR die bereitgestellte JSON-Datei als Gedächstnispeicher.
-- Überprüfe vorab, ob du einen neuen Punkt im Gedächtnisspeicher aufmachst, oder zu einem bestehen Punkt etwas ergänzt.
-- Als weiteres Hintergrundwissen benutze die Chat Historie.
+- Aktualisiere den Gedächtnisspeicher Memory im Kontext aus CURRENT_CONTEXT_JSON; Überprüfe vorab, ob du einen neuen Punkt im Memory aufmachst, oder zu einem bestehen Punkt etwas ergänzt.
+- Verwende die bereitgestellten JSON-Dateien des Kontexts CURRENT_CONTEXT_JSON, der Chat Historie CHAT_HISTORY und der Gesundheitsdaten des Nutzers NUTZER_GESUNDHEITSDATEN als dein Hintergrundwissen.
+- Die fiktiven Gesundheitsdaten des Nutzers in NUTZER_GESUNDHEITSDATEN sind für dich sichtbar und du darfst auf sie zugreifen.
 - Gib AUSSCHLIESSLICH gültiges JSON zurück.
-- WiedergabeAussage ist optional: wenn sinnvoll, gib eine kurze Spiegelung der Nutzerhaltung zu einer Entscheidungsdimension (max. 1 Satz); wenn nicht sinnvoll, gib leeren String "" zurück.
-- antwortAufFrageOderAufgabe ist optional: wenn der Nutzer eine Frage stellt oder eine Aufgabe gibt, MUSST du zuerst antwortAufFrageOderAufgabe sinnvoll ausfüllen.
-- antwortAufFrageOderAufgabe hat Priorität vor reflektierendeFrage.
+- WiedergabeAussage ist optional: wenn dem Nutzer dadurch seine Aussage verdeutlicht wird und demnach sinnvoll ist, gib eine kurze Spiegelung der Nutzerhaltung zu einer Entscheidungsdimension (max. 1 Satz); wenn nicht sinnvoll, gib leeren String "" zurück; Wenn der Nutzer etwas fragt, ist es nie sinnvoll.
+- Wenn ein Thema bereits besprochen ist in behandelteThemen aus deinem Gedächtnisspeicher, kannst du den Nutzer in WiedergabeAussage auch subtil darauf hinweisen, wenn sinnvoll
+- antwortAufFragenOderAufgaben ist optional: wenn der Nutzer eine oder mehrere Fragen oder Aufgaben an dich stellt, MUSST du diese ALLE zuerst in antwortAufFragenOderAufgaben sinnvoll beantworten; wenn der Nutzer dich nicht AKTIV fragt oder auffordert, gib einen leeren String "" zurück;
+- Du MUSST dem Nutze immer in antwortAufFragenOderAufgaben auf seine Fragen oder Aufforderungen antworten, damit der Nutzer sich gesehen fühlt von dir
+- antwortAufFragenOderAufgaben hat Priorität vor reflektierendeFrage.
 - reflektierendeFrage wird IMMER zusätzlich gestellt.
-- Für antwortAufFrageOderAufgabe gib Informationen aus Consent, Context oder ChatHistory NUR dann wieder, wenn der Nutzer aktiv eine Frage stellt oder ausdrücklich nach Informationen fragt.
-- Wenn ein Punkt im Kontext nur als Stichwort vorliegt (z.B. "Discrimination Concerns"), darfst du diesen NICHT weiter ausformulieren oder Beispiele erfinden.
-- Du darfst Informationen aus dem Kontext oder Consent NICHT interpretieren, erweitern oder mit eigenem Wissen ergänzen.
-- Du darfst ausschließlich Informationen wiedergeben, die explizit und konkret im Kontext oder Consent stehen.
-- Wenn die Nutzerfrage NICHT direkt durch explizite Informationen aus Kontext oder Consent beantwortet werden kann, MUSST du exakt schreiben:
-"Ich kann keine weiteren Informationen dazu geben, da mir dazu nichts bekannt ist."
-- Wenn der Nutzer lediglich eine Meinung, Präferenz oder Bewertung äußert, gib KEINE zusätzlichen Informationen wieder.
+- Für antwortAufFragenOderAufgaben gib generelle und neutrale Informationen aus dem Kontext CURRENT_CONTEXT_JSON, dem Consent CURRENT_CONTEXT_JSON, den Gesundheitsdaten des Nutzers NUTZER_GESUNDHEITSDATEN und allgemeinem Wissen wieder. Halte dich kurz und stelle KEINE Fragen.
+- Du darfst Informationen für antwortAufFragenOderAufgaben interpretieren oder mit eigenem Wissen erklären.
+- Wenn der Nutzer Details zu dem Consent wissen möchte, die du nicht kennst, musst du dem Nutzer mitteilen, dass der Consent fiktiv ist und vereinfacht ist für Forschungszwecke.
+- Wenn die Nutzerfrage direkte Empfehlungen zu Entscheidung von dir verlangt, MUSST du exakt schreiben:
+"Ich kann dir keine direkten Empfehlungen geben, da mir dazu nicht gemacht bin."
 - Du antwortest auf DEUTSCH.
 - Du dutzt den Nutzer.
 
@@ -191,7 +198,7 @@ Gib NUR dieses JSON-Format zurück zurück:
   ],
   "reflektierendeFrage": "string",
   "wiedergabeAussage": "string",
-  "antwortAufFrageOderAufgabe": "string"
+  "antwortAufFragenOderAufgaben": "string"
 }
 `;
 
@@ -217,6 +224,7 @@ app.post("/api/chat", async (req, res) => {
     const context = loadContext();
     const chatHistory = loadChatHistory();
     const consent = loadConsentById(consentId);
+    const ehrs = loadEHR();
 
     appendToChatHistory({
       role: "user",
@@ -237,6 +245,9 @@ app.post("/api/chat", async (req, res) => {
     
     CHAT_HISTORY:
 ${JSON.stringify(chatHistory, null, 2)}
+
+NUTZER_GESUNDHEITSDATEN:
+${JSON.stringify(ehrs, null, 2)}
 
     NUTZER_NACHRICHT:
     ${message}`
@@ -303,7 +314,7 @@ ${JSON.stringify(chatHistory, null, 2)}
               wiedergabeAussage: {
                 type: "string"
               },
-              antwortAufFrageOderAufgabe: {
+              antwortAufFragenOderAufgaben: {
                 type: "string"
               }
             },
@@ -313,7 +324,7 @@ ${JSON.stringify(chatHistory, null, 2)}
               "konversationZusammenfassung",
               "reflektierendeFrage",
               "wiedergabeAussage",
-              "antwortAufFrageOderAufgabe"
+              "antwortAufFragenOderAufgaben"
             ]
           }
         }
@@ -334,8 +345,8 @@ ${JSON.stringify(chatHistory, null, 2)}
       replyParts.push(update.wiedergabeAussage);
     }
 
-    if (update.antwortAufFrageOderAufgabe) {
-      replyParts.push(update.antwortAufFrageOderAufgabe);
+    if (update.antwortAufFragenOderAufgaben) {
+      replyParts.push(update.antwortAufFragenOderAufgaben);
     }
 
     replyParts.push(update.reflektierendeFrage);
@@ -484,12 +495,13 @@ app.post("/api/perspective", async (req, res) => {
 
       Deine Aufgabe:
 
-      1. Analysiere den Kontext und den Consent und finde relevante Dimensionen oder Faktoren (max. 3) für die Entscheidung, die noch OFFEN sind und mehr besprochen werden sollten.
-      3. Erstelle zu jedem Thema genau EINE neutrale reflektierende Frage.
+      1. Analysiere den Kontext und finde relevante Dimensionen oder Faktoren (max. 3) für die Entscheidung, die noch OFFEN sind oder mehr besprochen werden müssen.
+      3. Erstelle zu jedem Thema genau EINE neutrale reflektierende Frage im Stil von Forward Reasoning. Achte bei der reflektierenden Fragen darauf NICHT nach unbekannten Fakten, hypothetischen Szenarien oder Detailwissen zu fragen, sondern nach der Haltung, Prioritäten, Werte, Sorgen oder Gewichtung des Nutzers zu der aktuellen Entscheidungsdimension oder -faktor.
       5. Wiederhole keine bereits ausführlich behandelten Themen, die unter behandelteThemen den Status "besprochen" haben.
-      6. Gib keine Empfehlungen.
+      6. Gib NIEMALS Empfehlungen.
       7. Antworte AUSSCHLIESSLICH auf DEUTSCH.
-      8. Gib ausschließlich gültiges JSON zurück.
+      8. Du dutzt den Nutzer.
+      9. Gib ausschließlich gültiges JSON zurück.
 
 Gib dieses Format zurück:
 {
@@ -512,6 +524,7 @@ ${JSON.stringify(consent, null, 2)}`
         }
       ]
     });
+    console.log(response.output_text);
 
     const result = JSON.parse(response.output_text);
 

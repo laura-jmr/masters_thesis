@@ -1,0 +1,31 @@
+{
+    "Demografie": {
+        "Name": "Beatty507",
+        "Vorname": "Jerry654",
+        "Alter": "18",
+        "Geburtstag": "2007-11-04",
+        "Herkunft": "Südamerika"
+    },
+    "Befunde": [
+        "2026-01-11 - 2026-01-11: Zahnfleischerkrankung (Erkrankung)",
+        "2025-12-28 - : Stress (Befund)",
+        "2025-12-28 - : Arbeitslos (Befund)",
+        "2024-12-01 - 2025-06-29: Normale Schwangerschaft (Befund)",
+        "2024-03-22 - 2024-04-04: Akute Bronchitis (Erkrankung)",
+        "2024-01-07 - 2024-05-02: Unterarmbruch (Erkrankung)",
+        "2020-01-31 - 2025-11-09: Aufmerksamkeitsdefizitstörung bei Kindern (Erkrankung)"
+    ],
+    "Berichte": [
+        "2025-12-28: Test zur Erkennung von Alkoholproblemen – Konsum [AUDIT-C] - Gesamtpunktzahl [AUDIT-C]: 1.0 [Punktzahl]",
+        "2025-12-28: Fragebogen zu Demütigung, Angst, Vergewaltigung und Schlägen [HARK] - Gesamtpunktzahl [HARK]: 0.0 [Punktzahl]",
+        "2025-12-28: 7-Punkte-Fragebogen zur generalisierten Angststörung (GAD-7) - 7-Punkte-Fragebogen zur generalisierten Angststörung (GAD-7) Gesamtpunktzahl [Reported.PHQ] 1.0 [Punktzahl]",
+        "2024-03-31: Morse-Fall-Skala-Tafel - Gesamtsturzrisiko [Morse-Sturzskala]: 39.0 (#) - Sturzrisikostufe [Morse-Fall-Skala]: Mäßiges Risiko (MFS-Wert 25–45)",
+        "2023-12-17: CBC-Panel – Blutbild mittels automatisierter Zählung - Leukozyten [#/Volumen] im Blut (automatische Zählung): 5,2 × 10³/µl - Erythrozyten [#/Volumen] im Blut (automatische Zählung): 5,1 × 10⁶/µl - Hämoglobin [Masse/Volumen] im Blut: 13,7 g/dl - Hämatokrit [Volumenanteil] des Blutes nach automatischer Messung: 41,1 % - MCV [mittleres korpuskuläres Volumen] der roten Blutkörperchen bei automatischer Zählung: 81,3 fL - MCH [Hämoglobin-Konzentration] bei automatischer Zählung: 27,2 pg - MCHC [mittleres Hämoglobingewicht] in roten Blutkörperchen bei automatischer Zählung: 34,7 g/dl - Erythrozyten [DistWidth] im Blut, automatische Zählung: 40,4 fL - Thrombozyten [#/Volumen] im Blut (automatische Zählung): 320,3 × 10³/µl - Verteilungsbreite der Thrombozyten [Entitisches Volumen] im Blut bei automatischer Zählung: 263,0 fL - Thrombozyten [mittleres Volumen] im Blut, automatische Zählung: 11,4 fL"
+    ],
+    "Beobachtungen": [
+        "2025-12-28: Protokoll zur Erfassung und Bewertung der Ressourcen, Risiken und Erfahrungen von Patienten [PRAPARE] - Hattest du im letzten Jahr Angst vor deinem Partner oder Ex-Partner: Nein - Fühlst du dich an deinem derzeitigen Wohnort körperlich und emotional sicher [PRAPARE]: Ja - Sind Sie ein Flüchtling? Nein - Haben Sie im letzten Jahr mehr als zwei Nächte in Folge in einem Gefängnis, einer Haftanstalt, einer Jugendstrafanstalt oder einer Jugendstrafvollzugsanstalt verbracht [PRAPARE]: Nein - Stresslevel: Ein bisschen - Wie oft sehen Sie Menschen, die Ihnen am Herzen liegen und denen Sie sich verbunden fühlen, oder sprechen mit ihnen [PRAPARE]: 3 bis 5 Mal pro Woche - Hat Ihnen der fehlende Transport zu Arztterminen, Besprechungen, zur Arbeit oder zum Einkauf von Dingen des täglichen Bedarfs den Weg versperrt: Nein - Konnten Sie oder Familienmitglieder, mit denen Sie zusammenleben, im letzten Jahr etwas von Folgendem nicht bekommen, obwohl es dringend benötigt wurde [PRAPARE]: Versorgungsleistungen - Wie hoch schätzt du das Gesamteinkommen aller Familienmitglieder aus allen Quellen vor Steuern im letzten Jahr [PhenX]? 10819 /a - Hauptversicherung: Medicaid - Beschäftigungsstatus – aktuell: Arbeitslos - Höchster Bildungsabschluss: unterhalb des Abiturs - Adresse: 728 Klein Overpass, Wohnung 42 - Haben Sie Angst, Ihre Wohnung zu verlieren [PRAPARE]: Ja - Wohnsituation: Ich habe eine Wohnung - Wie viele Personen leben oder wohnen unter dieser Adresse [#]: 3,0 (#) - Bevorzugte Sprache: Deutsch - Aus den Deutschem Militär entlassen: Nein - War die Arbeit als Saison- oder Wanderarbeiter in der Landwirtschaft in den letzten zwei Jahren zu irgendeinem Zeitpunkt die Haupteinkommensquelle für Sie oder Ihre Familie [PRAPARE]: Nein - Ethnie: Weiß - Hispanoamerikaner oder Latino: Nein",
+        "Raucherstatus: Noch nie Tabak geraucht (Befund)",
+        "Herzfrequenz: 86.0 /Min",
+        "Blutdruckmessung bei allen Kindern (optional): - Diastolischer Blutdruck: 84,0 mm[Hg] - Systolischer Blutdruck: 107,0 mm[Hg]"
+    ]
+}
